@@ -35,7 +35,7 @@ export const ExpenseCard = ({ expense, onDelete }: ExpenseCardProps) => {
 
       <div className="flex items-center gap-2">
         <span className="font-display font-semibold text-lg">
-          ${expense.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          ₵{expense.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
         </span>
         <Button
           variant="ghost"
