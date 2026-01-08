@@ -1,57 +1,120 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Expense, Category } from '@/types/expense';
-
-const STORAGE_KEY = 'expense-tracker-data';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useExpenses = () => {
+  const { user } = useAuth();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load from localStorage on mount
+  // Fetch expenses from Supabase
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setExpenses(parsed);
-      } catch (e) {
-        console.error('Failed to parse stored expenses:', e);
+    const fetchExpenses = async () => {
+      if (!user) {
+        setExpenses([]);
+        setIsLoaded(true);
+        return;
       }
-    }
-    setIsLoaded(true);
-  }, []);
 
-  // Save to localStorage whenever expenses change
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
-    }
-  }, [expenses, isLoaded]);
+      const { data, error } = await supabase
+        .from('expenses')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false });
 
-  const addExpense = useCallback((expense: Omit<Expense, 'id' | 'createdAt'>) => {
-    const newExpense: Expense = {
-      ...expense,
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
+      if (error) {
+        console.error('Error fetching expenses:', error);
+      } else {
+        setExpenses(
+          (data || []).map(e => ({
+            id: e.id,
+            amount: Number(e.amount),
+            category: e.category as Category,
+            date: e.date,
+            note: e.note || undefined,
+            createdAt: e.created_at,
+          }))
+        );
+      }
+      setIsLoaded(true);
     };
+
+    fetchExpenses();
+  }, [user]);
+
+  const addExpense = useCallback(async (expense: Omit<Expense, 'id' | 'createdAt'>) => {
+    if (!user) return null;
+
+    const { data, error } = await supabase
+      .from('expenses')
+      .insert({
+        user_id: user.id,
+        amount: expense.amount,
+        category: expense.category,
+        date: expense.date,
+        note: expense.note || null,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding expense:', error);
+      return null;
+    }
+
+    const newExpense: Expense = {
+      id: data.id,
+      amount: Number(data.amount),
+      category: data.category as Category,
+      date: data.date,
+      note: data.note || undefined,
+      createdAt: data.created_at,
+    };
+
     setExpenses(prev => [newExpense, ...prev]);
     return newExpense;
-  }, []);
+  }, [user]);
 
-  const updateExpense = useCallback((id: string, updates: Partial<Omit<Expense, 'id' | 'createdAt'>>) => {
-    setExpenses(prev => prev.map(expense => 
+  const updateExpense = useCallback(async (id: string, updates: Partial<Omit<Expense, 'id' | 'createdAt'>>) => {
+    const { error } = await supabase
+      .from('expenses')
+      .update({
+        amount: updates.amount,
+        category: updates.category,
+        date: updates.date,
+        note: updates.note || null,
+      })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error updating expense:', error);
+      return;
+    }
+
+    setExpenses(prev => prev.map(expense =>
       expense.id === id ? { ...expense, ...updates } : expense
     ));
   }, []);
 
-  const deleteExpense = useCallback((id: string) => {
+  const deleteExpense = useCallback(async (id: string) => {
+    const { error } = await supabase
+      .from('expenses')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting expense:', error);
+      return;
+    }
+
     setExpenses(prev => prev.filter(e => e.id !== id));
   }, []);
 
   const getMonthlyExpenses = useCallback((month: Date = new Date()) => {
     const year = month.getFullYear();
     const monthIndex = month.getMonth();
-    
+
     return expenses.filter(expense => {
       const expenseDate = new Date(expense.date);
       return expenseDate.getFullYear() === year && expenseDate.getMonth() === monthIndex;
