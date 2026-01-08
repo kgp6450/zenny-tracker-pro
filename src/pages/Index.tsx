@@ -4,20 +4,23 @@ import { useExpenses } from '@/hooks/useExpenses';
 import { MonthlySummary } from '@/components/MonthlySummary';
 import { ExpenseList } from '@/components/ExpenseList';
 import { AddExpenseSheet } from '@/components/AddExpenseSheet';
+import { MonthNavigator } from '@/components/MonthNavigator';
 
 const Index = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
+  
   const { 
     addExpense, 
     deleteExpense, 
     getMonthlyTotal, 
     getCategoryTotals, 
-    getRecentExpenses 
+    getMonthlyExpenses 
   } = useExpenses();
 
-  const monthlyTotal = getMonthlyTotal();
-  const categoryTotals = getCategoryTotals();
-  const recentExpenses = getRecentExpenses(20);
+  const monthlyTotal = getMonthlyTotal(selectedMonth);
+  const categoryTotals = getCategoryTotals(selectedMonth);
+  const monthlyExpenses = getMonthlyExpenses(selectedMonth);
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -32,25 +35,32 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="px-5 space-y-8">
+      <main className="px-5 space-y-6">
+        {/* Month Navigator */}
+        <MonthNavigator 
+          selectedMonth={selectedMonth}
+          onMonthChange={setSelectedMonth}
+        />
+
         {/* Monthly Summary */}
         <MonthlySummary 
           total={monthlyTotal} 
-          categoryTotals={categoryTotals} 
+          categoryTotals={categoryTotals}
+          month={selectedMonth}
         />
 
-        {/* Recent Expenses */}
+        {/* Monthly Expenses */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-lg font-semibold text-foreground">
-              Recent Expenses
+              Expenses
             </h2>
             <span className="text-sm text-muted-foreground">
-              {recentExpenses.length} items
+              {monthlyExpenses.length} {monthlyExpenses.length === 1 ? 'item' : 'items'}
             </span>
           </div>
           <ExpenseList 
-            expenses={recentExpenses} 
+            expenses={monthlyExpenses} 
             onDelete={deleteExpense} 
           />
         </section>
