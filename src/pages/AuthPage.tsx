@@ -1,15 +1,64 @@
+import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogIn } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 
 export const AuthPage = () => {
-  const { signInWithGoogle, loading } = useAuth();
+  const { signInWithGoogle, signInWithEmail, signUpWithEmail, loading } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
     } catch (error) {
       console.error('Sign in error:', error);
+      toast.error('Failed to sign in with Google');
+    }
+  };
+
+  const handleEmailAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      if (isSignUp) {
+        const { error } = await signUpWithEmail(email, password);
+        if (error) {
+          if (error.message.includes('already registered')) {
+            toast.error('This email is already registered. Try signing in instead.');
+          } else {
+            toast.error(error.message);
+          }
+        } else {
+          toast.success('Account created! You can now sign in.');
+          setIsSignUp(false);
+          setPassword('');
+        }
+      } else {
+        const { error } = await signInWithEmail(email, password);
+        if (error) {
+          if (error.message.includes('Invalid login')) {
+            toast.error('Invalid email or password');
+          } else {
+            toast.error(error.message);
+          }
+        }
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -33,16 +82,58 @@ export const AuthPage = () => {
         <div className="bg-card rounded-2xl p-6 shadow-lg space-y-6">
           <div className="text-center">
             <h2 className="font-display text-xl font-semibold text-foreground">
-              Welcome
+              {isSignUp ? 'Create Account' : 'Welcome Back'}
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Sign in to sync your expenses across devices
+              {isSignUp ? 'Sign up to start tracking expenses' : 'Sign in to sync your expenses'}
             </p>
+          </div>
+
+          {/* Email/Password Form */}
+          <form onSubmit={handleEmailAuth} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isSubmitting}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isSubmitting}
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={loading || isSubmitting}
+              className="w-full h-12 text-base font-semibold"
+            >
+              {isSubmitting ? 'Please wait...' : isSignUp ? 'Sign Up' : 'Sign In'}
+            </Button>
+          </form>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+            </div>
           </div>
 
           <Button
             onClick={handleGoogleSignIn}
-            disabled={loading}
+            disabled={loading || isSubmitting}
             className="w-full h-12 text-base font-semibold gap-3"
             variant="outline"
           >
@@ -66,6 +157,20 @@ export const AuthPage = () => {
             </svg>
             Continue with Google
           </Button>
+
+          <p className="text-center text-sm text-muted-foreground">
+            {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+            <button
+              type="button"
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setPassword('');
+              }}
+              className="text-primary font-medium hover:underline"
+            >
+              {isSignUp ? 'Sign in' : 'Sign up'}
+            </button>
+          </p>
         </div>
 
         <p className="text-xs text-center text-muted-foreground">
