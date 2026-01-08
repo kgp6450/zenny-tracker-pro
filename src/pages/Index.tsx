@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import { useExpenses } from '@/hooks/useExpenses';
 import { MonthlySummary } from '@/components/MonthlySummary';
@@ -7,12 +7,15 @@ import { AddExpenseSheet } from '@/components/AddExpenseSheet';
 import { EditExpenseSheet } from '@/components/EditExpenseSheet';
 import { MonthNavigator } from '@/components/MonthNavigator';
 import { CategoryPieChart } from '@/components/CategoryPieChart';
-import { Expense } from '@/types/expense';
+import { ExpenseFilter } from '@/components/ExpenseFilter';
+import { Expense, Category } from '@/types/expense';
 
 const Index = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
   
   const { 
     addExpense,
@@ -26,6 +29,28 @@ const Index = () => {
   const monthlyTotal = getMonthlyTotal(selectedMonth);
   const categoryTotals = getCategoryTotals(selectedMonth);
   const monthlyExpenses = getMonthlyExpenses(selectedMonth);
+
+  // Filter expenses based on search query and selected categories
+  const filteredExpenses = useMemo(() => {
+    return monthlyExpenses.filter(expense => {
+      // Filter by search query (in notes)
+      const matchesSearch = !searchQuery || 
+        (expense.note && expense.note.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      // Filter by selected categories
+      const matchesCategory = selectedCategories.length === 0 || 
+        selectedCategories.includes(expense.category);
+      
+      return matchesSearch && matchesCategory;
+    });
+  }, [monthlyExpenses, searchQuery, selectedCategories]);
+
+  // Reset filters when month changes
+  const handleMonthChange = (month: Date) => {
+    setSelectedMonth(month);
+    setSearchQuery('');
+    setSelectedCategories([]);
+  };
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -44,7 +69,7 @@ const Index = () => {
         {/* Month Navigator */}
         <MonthNavigator 
           selectedMonth={selectedMonth}
-          onMonthChange={setSelectedMonth}
+          onMonthChange={handleMonthChange}
         />
 
         {/* Monthly Summary */}
@@ -64,11 +89,22 @@ const Index = () => {
               Expenses
             </h2>
             <span className="text-sm text-muted-foreground">
-              {monthlyExpenses.length} {monthlyExpenses.length === 1 ? 'item' : 'items'}
+              {filteredExpenses.length} of {monthlyExpenses.length} {monthlyExpenses.length === 1 ? 'item' : 'items'}
             </span>
           </div>
+
+          {/* Search & Filter */}
+          <div className="mb-4">
+            <ExpenseFilter
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              selectedCategories={selectedCategories}
+              onCategoriesChange={setSelectedCategories}
+            />
+          </div>
+
           <ExpenseList 
-            expenses={monthlyExpenses} 
+            expenses={filteredExpenses} 
             onEdit={setEditingExpense}
           />
         </section>
