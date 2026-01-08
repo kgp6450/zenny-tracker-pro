@@ -5,6 +5,7 @@ import { MonthlySummary } from '@/components/MonthlySummary';
 import { ExpenseList } from '@/components/ExpenseList';
 import { AddExpenseSheet } from '@/components/AddExpenseSheet';
 import { MonthNavigator } from '@/components/MonthNavigator';
+import { CategoryPieChart } from '@/components/CategoryPieChart';
 
 const Index = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -48,6 +49,9 @@ const Index = () => {
           categoryTotals={categoryTotals}
           month={selectedMonth}
         />
+
+        {/* Category Pie Chart */}
+        <CategoryPieChart categoryTotals={categoryTotals} />
 
         {/* Monthly Expenses */}
         <section>
