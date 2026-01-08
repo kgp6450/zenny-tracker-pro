@@ -38,6 +38,12 @@ export const useExpenses = () => {
     return newExpense;
   }, []);
 
+  const updateExpense = useCallback((id: string, updates: Partial<Omit<Expense, 'id' | 'createdAt'>>) => {
+    setExpenses(prev => prev.map(expense => 
+      expense.id === id ? { ...expense, ...updates } : expense
+    ));
+  }, []);
+
   const deleteExpense = useCallback((id: string) => {
     setExpenses(prev => prev.filter(e => e.id !== id));
   }, []);
@@ -84,6 +90,7 @@ export const useExpenses = () => {
     expenses,
     isLoaded,
     addExpense,
+    updateExpense,
     deleteExpense,
     getMonthlyExpenses,
     getMonthlyTotal,

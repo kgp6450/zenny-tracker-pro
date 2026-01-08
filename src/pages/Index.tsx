@@ -4,15 +4,19 @@ import { useExpenses } from '@/hooks/useExpenses';
 import { MonthlySummary } from '@/components/MonthlySummary';
 import { ExpenseList } from '@/components/ExpenseList';
 import { AddExpenseSheet } from '@/components/AddExpenseSheet';
+import { EditExpenseSheet } from '@/components/EditExpenseSheet';
 import { MonthNavigator } from '@/components/MonthNavigator';
 import { CategoryPieChart } from '@/components/CategoryPieChart';
+import { Expense } from '@/types/expense';
 
 const Index = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   
   const { 
-    addExpense, 
+    addExpense,
+    updateExpense,
     deleteExpense, 
     getMonthlyTotal, 
     getCategoryTotals, 
@@ -65,7 +69,7 @@ const Index = () => {
           </div>
           <ExpenseList 
             expenses={monthlyExpenses} 
-            onDelete={deleteExpense} 
+            onEdit={setEditingExpense}
           />
         </section>
       </main>
@@ -84,6 +88,15 @@ const Index = () => {
         open={isAddOpen}
         onOpenChange={setIsAddOpen}
         onAdd={addExpense}
+      />
+
+      {/* Edit Expense Sheet */}
+      <EditExpenseSheet
+        expense={editingExpense}
+        open={!!editingExpense}
+        onOpenChange={(open) => !open && setEditingExpense(null)}
+        onUpdate={updateExpense}
+        onDelete={deleteExpense}
       />
     </div>
   );
