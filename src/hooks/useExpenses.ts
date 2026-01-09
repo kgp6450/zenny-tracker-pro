@@ -21,7 +21,8 @@ export const useExpenses = () => {
         .from('expenses')
         .select('*')
         .eq('user_id', user.id)
-        .order('date', { ascending: false });
+        .order('date', { ascending: false })
+        .order('time', { ascending: false });
 
       if (error) {
         console.error('Error fetching expenses:', error);
@@ -149,7 +150,11 @@ export const useExpenses = () => {
 
   const getRecentExpenses = useCallback((limit: number = 10) => {
     return [...expenses]
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .sort((a, b) => {
+        const dateCompare = new Date(b.date).getTime() - new Date(a.date).getTime();
+        if (dateCompare !== 0) return dateCompare;
+        return b.time.localeCompare(a.time);
+      })
       .slice(0, limit);
   }, [expenses]);
 
