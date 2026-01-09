@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { Plus, LogOut } from 'lucide-react';
+import { useState } from 'react';
+import { Plus, LogOut, Calendar, List } from 'lucide-react';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useAuth } from '@/contexts/AuthContext';
 import { MonthlySummary } from '@/components/MonthlySummary';
@@ -9,9 +9,12 @@ import { EditExpenseSheet } from '@/components/EditExpenseSheet';
 import { MonthNavigator } from '@/components/MonthNavigator';
 import { CategoryPieChart } from '@/components/CategoryPieChart';
 import { ExpenseFilter } from '@/components/ExpenseFilter';
+import { ExpenseCalendar } from '@/components/ExpenseCalendar';
+import { DayExpensesSheet } from '@/components/DayExpensesSheet';
 import { AuthPage } from '@/pages/AuthPage';
 import { Expense, Category } from '@/types/expense';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const Index = () => {
   const { user, loading, signOut } = useAuth();
@@ -20,6 +23,10 @@ const Index = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [selectedDayExpenses, setSelectedDayExpenses] = useState<Expense[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [isDaySheetOpen, setIsDaySheetOpen] = useState(false);
   
   const { 
     addExpense,
@@ -65,6 +72,14 @@ const Index = () => {
     setSelectedMonth(month);
     setSearchQuery('');
     setSelectedCategories([]);
+    setSelectedDate(null);
+    setSelectedDayExpenses([]);
+  };
+
+  const handleDaySelect = (date: Date, expenses: Expense[]) => {
+    setSelectedDate(date);
+    setSelectedDayExpenses(expenses);
+    setIsDaySheetOpen(true);
   };
 
   const handleSignOut = async () => {
@@ -117,31 +132,64 @@ const Index = () => {
         {/* Category Pie Chart */}
         <CategoryPieChart categoryTotals={categoryTotals} />
 
-        {/* Monthly Expenses */}
+        {/* Expenses Section */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-lg font-semibold text-foreground">
               Expenses
             </h2>
-            <span className="text-sm text-muted-foreground">
-              {filteredExpenses.length} of {monthlyExpenses.length} {monthlyExpenses.length === 1 ? 'item' : 'items'}
-            </span>
+            <div className="flex items-center gap-2">
+              <div className="flex bg-muted rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={cn(
+                    "p-2 rounded-md transition-colors",
+                    viewMode === 'list' ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <List className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('calendar')}
+                  className={cn(
+                    "p-2 rounded-md transition-colors",
+                    viewMode === 'calendar' ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Calendar className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* Search & Filter */}
-          <div className="mb-4">
-            <ExpenseFilter
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              selectedCategories={selectedCategories}
-              onCategoriesChange={setSelectedCategories}
+          {viewMode === 'list' ? (
+            <>
+              {/* Search & Filter */}
+              <div className="mb-4">
+                <ExpenseFilter
+                  searchQuery={searchQuery}
+                  onSearchChange={setSearchQuery}
+                  selectedCategories={selectedCategories}
+                  onCategoriesChange={setSelectedCategories}
+                />
+              </div>
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-sm text-muted-foreground">
+                  {filteredExpenses.length} of {monthlyExpenses.length} {monthlyExpenses.length === 1 ? 'item' : 'items'}
+                </span>
+              </div>
+              <ExpenseList 
+                expenses={filteredExpenses} 
+                onEdit={setEditingExpense}
+              />
+            </>
+          ) : (
+            <ExpenseCalendar
+              expenses={monthlyExpenses}
+              selectedMonth={selectedMonth}
+              onDaySelect={handleDaySelect}
             />
-          </div>
-
-          <ExpenseList 
-            expenses={filteredExpenses} 
-            onEdit={setEditingExpense}
-          />
+          )}
         </section>
       </main>
 
@@ -168,6 +216,15 @@ const Index = () => {
         onOpenChange={(open) => !open && setEditingExpense(null)}
         onUpdate={updateExpense}
         onDelete={deleteExpense}
+      />
+
+      {/* Day Expenses Sheet */}
+      <DayExpensesSheet
+        open={isDaySheetOpen}
+        onOpenChange={setIsDaySheetOpen}
+        date={selectedDate}
+        expenses={selectedDayExpenses}
+        onEditExpense={setEditingExpense}
       />
     </div>
   );
