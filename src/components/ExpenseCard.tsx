@@ -30,7 +30,7 @@ export const ExpenseCard = ({ expense, onEdit }: ExpenseCardProps) => {
           </p>
         )}
         <p className="text-xs text-muted-foreground mt-1">
-          {format(new Date(expense.date), 'MMM d, yyyy')}
+          {format(new Date(expense.date), 'MMM d, yyyy')} at {expense.time?.slice(0, 5) || '12:00'}
         </p>
       </div>
 

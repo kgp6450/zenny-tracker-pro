@@ -32,6 +32,7 @@ export const useExpenses = () => {
             amount: Number(e.amount),
             category: e.category as Category,
             date: e.date,
+            time: e.time || '12:00:00',
             note: e.note || undefined,
             createdAt: e.created_at,
           }))
@@ -53,6 +54,7 @@ export const useExpenses = () => {
         amount: expense.amount,
         category: expense.category,
         date: expense.date,
+        time: expense.time,
         note: expense.note || null,
       })
       .select()
@@ -68,6 +70,7 @@ export const useExpenses = () => {
       amount: Number(data.amount),
       category: data.category as Category,
       date: data.date,
+      time: data.time || '12:00:00',
       note: data.note || undefined,
       createdAt: data.created_at,
     };
@@ -83,6 +86,7 @@ export const useExpenses = () => {
         amount: updates.amount,
         category: updates.category,
         date: updates.date,
+        time: updates.time,
         note: updates.note || null,
       })
       .eq('id', id);
