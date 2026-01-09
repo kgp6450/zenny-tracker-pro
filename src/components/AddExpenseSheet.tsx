@@ -11,13 +11,14 @@ import { cn } from '@/lib/utils';
 interface AddExpenseSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAdd: (expense: { amount: number; category: Category; date: string; note?: string }) => void;
+  onAdd: (expense: { amount: number; category: Category; date: string; time: string; note?: string }) => void;
 }
 
 export const AddExpenseSheet = ({ open, onOpenChange, onAdd }: AddExpenseSheetProps) => {
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState<Category>('food');
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [time, setTime] = useState(format(new Date(), 'HH:mm'));
   const [note, setNote] = useState('');
   const [errors, setErrors] = useState<{ amount?: string }>({});
 
@@ -34,6 +35,7 @@ export const AddExpenseSheet = ({ open, onOpenChange, onAdd }: AddExpenseSheetPr
       amount: parsedAmount,
       category,
       date,
+      time,
       note: note.trim() || undefined,
     });
 
@@ -41,6 +43,7 @@ export const AddExpenseSheet = ({ open, onOpenChange, onAdd }: AddExpenseSheetPr
     setAmount('');
     setCategory('food');
     setDate(format(new Date(), 'yyyy-MM-dd'));
+    setTime(format(new Date(), 'HH:mm'));
     setNote('');
     setErrors({});
     onOpenChange(false);
@@ -106,16 +109,28 @@ export const AddExpenseSheet = ({ open, onOpenChange, onAdd }: AddExpenseSheetPr
             </div>
           </div>
 
-          {/* Date */}
-          <div className="space-y-2">
-            <Label htmlFor="date">Date</Label>
-            <Input
-              id="date"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="h-12"
-            />
+          {/* Date & Time */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="date">Date</Label>
+              <Input
+                id="date"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="h-12"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="time">Time</Label>
+              <Input
+                id="time"
+                type="time"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                className="h-12"
+              />
+            </div>
           </div>
 
           {/* Note */}

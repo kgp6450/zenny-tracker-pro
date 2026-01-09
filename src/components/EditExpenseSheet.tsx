@@ -20,6 +20,7 @@ export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDele
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState<Category>('food');
   const [date, setDate] = useState('');
+  const [time, setTime] = useState('12:00');
   const [note, setNote] = useState('');
   const [errors, setErrors] = useState<{ amount?: string }>({});
 
@@ -29,6 +30,7 @@ export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDele
       setAmount(expense.amount.toString());
       setCategory(expense.category);
       setDate(expense.date);
+      setTime(expense.time?.slice(0, 5) || '12:00');
       setNote(expense.note || '');
       setErrors({});
     }
@@ -49,6 +51,7 @@ export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDele
       amount: parsedAmount,
       category,
       date,
+      time,
       note: note.trim() || undefined,
     });
 
@@ -123,16 +126,28 @@ export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDele
             </div>
           </div>
 
-          {/* Date */}
-          <div className="space-y-2">
-            <Label htmlFor="edit-date">Date</Label>
-            <Input
-              id="edit-date"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="h-12"
-            />
+          {/* Date & Time */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="edit-date">Date</Label>
+              <Input
+                id="edit-date"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="h-12"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-time">Time</Label>
+              <Input
+                id="edit-time"
+                type="time"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                className="h-12"
+              />
+            </div>
           </div>
 
           {/* Note */}
