@@ -8,6 +8,7 @@ import { AddExpenseSheet } from '@/components/AddExpenseSheet';
 import { EditExpenseSheet } from '@/components/EditExpenseSheet';
 import { PeriodNavigator, PeriodType } from '@/components/PeriodNavigator';
 import { CategoryPieChart } from '@/components/CategoryPieChart';
+import { SpendingTrendsChart } from '@/components/SpendingTrendsChart';
 import { ExpenseFilter } from '@/components/ExpenseFilter';
 import { ExpenseCalendar } from '@/components/ExpenseCalendar';
 import { DayExpensesSheet } from '@/components/DayExpensesSheet';
@@ -30,6 +31,7 @@ const Index = () => {
   const [isDaySheetOpen, setIsDaySheetOpen] = useState(false);
   
   const { 
+    expenses,
     addExpense,
     updateExpense,
     deleteExpense, 
@@ -168,6 +170,13 @@ const Index = () => {
 
         {/* Category Pie Chart */}
         <CategoryPieChart categoryTotals={categoryTotals} />
+
+        {/* Spending Trends Chart */}
+        <SpendingTrendsChart 
+          expenses={expenses}
+          periodType={periodType}
+          currentDate={selectedDate}
+        />
 
         {/* Expenses Section */}
         <section>
