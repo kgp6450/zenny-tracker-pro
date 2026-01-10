@@ -131,8 +131,7 @@ export const useExpenses = () => {
     return monthlyExpenses.reduce((sum, expense) => sum + expense.amount, 0);
   }, [getMonthlyExpenses]);
 
-  const getCategoryTotals = useCallback((month: Date = new Date()) => {
-    const monthlyExpenses = getMonthlyExpenses(month);
+  const getCategoryTotals = useCallback((expenseList: Expense[]) => {
     const totals: Record<Category, number> = {
       food: 0,
       transport: 0,
@@ -141,12 +140,42 @@ export const useExpenses = () => {
       other: 0,
     };
 
-    monthlyExpenses.forEach(expense => {
+    expenseList.forEach(expense => {
       totals[expense.category] += expense.amount;
     });
 
     return totals;
-  }, [getMonthlyExpenses]);
+  }, []);
+
+  const getWeeklyExpenses = useCallback((date: Date = new Date()) => {
+    const { startOfWeek, endOfWeek } = require('date-fns');
+    const weekStart = startOfWeek(date, { weekStartsOn: 1 });
+    const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
+
+    return expenses.filter(expense => {
+      const expenseDate = new Date(expense.date);
+      return expenseDate >= weekStart && expenseDate <= weekEnd;
+    });
+  }, [expenses]);
+
+  const getYearlyExpenses = useCallback((date: Date = new Date()) => {
+    const year = date.getFullYear();
+
+    return expenses.filter(expense => {
+      const expenseDate = new Date(expense.date);
+      return expenseDate.getFullYear() === year;
+    });
+  }, [expenses]);
+
+  const getWeeklyTotal = useCallback((date: Date = new Date()) => {
+    const weeklyExpenses = getWeeklyExpenses(date);
+    return weeklyExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  }, [getWeeklyExpenses]);
+
+  const getYearlyTotal = useCallback((date: Date = new Date()) => {
+    const yearlyExpenses = getYearlyExpenses(date);
+    return yearlyExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  }, [getYearlyExpenses]);
 
   const getRecentExpenses = useCallback((limit: number = 10) => {
     return [...expenses]
@@ -166,6 +195,10 @@ export const useExpenses = () => {
     deleteExpense,
     getMonthlyExpenses,
     getMonthlyTotal,
+    getWeeklyExpenses,
+    getWeeklyTotal,
+    getYearlyExpenses,
+    getYearlyTotal,
     getCategoryTotals,
     getRecentExpenses,
   };
