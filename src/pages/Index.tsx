@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus, LogOut, Calendar, List } from 'lucide-react';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useAuth } from '@/contexts/AuthContext';
-import { MonthlySummary } from '@/components/MonthlySummary';
+import { PeriodSummary } from '@/components/PeriodSummary';
 import { ExpenseList } from '@/components/ExpenseList';
 import { AddExpenseSheet } from '@/components/AddExpenseSheet';
 import { EditExpenseSheet } from '@/components/EditExpenseSheet';
-import { MonthNavigator } from '@/components/MonthNavigator';
+import { PeriodNavigator, PeriodType } from '@/components/PeriodNavigator';
 import { CategoryPieChart } from '@/components/CategoryPieChart';
 import { ExpenseFilter } from '@/components/ExpenseFilter';
 import { ExpenseCalendar } from '@/components/ExpenseCalendar';
@@ -20,12 +20,13 @@ const Index = () => {
   const { user, loading, signOut } = useAuth();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [periodType, setPeriodType] = useState<PeriodType>('month');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [selectedDayExpenses, setSelectedDayExpenses] = useState<Expense[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(null);
   const [isDaySheetOpen, setIsDaySheetOpen] = useState(false);
   
   const { 
@@ -33,8 +34,12 @@ const Index = () => {
     updateExpense,
     deleteExpense, 
     getMonthlyTotal, 
-    getCategoryTotals, 
     getMonthlyExpenses,
+    getWeeklyExpenses,
+    getWeeklyTotal,
+    getYearlyExpenses,
+    getYearlyTotal,
+    getCategoryTotals,
     isLoaded,
   } = useExpenses();
 
@@ -55,12 +60,35 @@ const Index = () => {
     return <AuthPage />;
   }
 
-  const monthlyTotal = getMonthlyTotal(selectedMonth);
-  const categoryTotals = getCategoryTotals(selectedMonth);
-  const monthlyExpenses = getMonthlyExpenses(selectedMonth);
+  // Get expenses and totals based on period type
+  const getPeriodExpenses = () => {
+    switch (periodType) {
+      case 'week':
+        return getWeeklyExpenses(selectedDate);
+      case 'month':
+        return getMonthlyExpenses(selectedDate);
+      case 'year':
+        return getYearlyExpenses(selectedDate);
+    }
+  };
+
+  const getPeriodTotal = () => {
+    switch (periodType) {
+      case 'week':
+        return getWeeklyTotal(selectedDate);
+      case 'month':
+        return getMonthlyTotal(selectedDate);
+      case 'year':
+        return getYearlyTotal(selectedDate);
+    }
+  };
+
+  const periodExpenses = getPeriodExpenses();
+  const periodTotal = getPeriodTotal();
+  const categoryTotals = getCategoryTotals(periodExpenses);
 
   // Filter expenses based on search query and selected categories
-  const filteredExpenses = monthlyExpenses.filter(expense => {
+  const filteredExpenses = periodExpenses.filter(expense => {
     const matchesSearch = !searchQuery || 
       (expense.note && expense.note.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesCategory = selectedCategories.length === 0 || 
@@ -68,16 +96,22 @@ const Index = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const handleMonthChange = (month: Date) => {
-    setSelectedMonth(month);
+  const handleDateChange = (date: Date) => {
+    setSelectedDate(date);
     setSearchQuery('');
     setSelectedCategories([]);
-    setSelectedDate(null);
+    setSelectedDayDate(null);
     setSelectedDayExpenses([]);
   };
 
+  const handlePeriodTypeChange = (type: PeriodType) => {
+    setPeriodType(type);
+    setSearchQuery('');
+    setSelectedCategories([]);
+  };
+
   const handleDaySelect = (date: Date, expenses: Expense[]) => {
-    setSelectedDate(date);
+    setSelectedDayDate(date);
     setSelectedDayExpenses(expenses);
     setIsDaySheetOpen(true);
   };
@@ -116,17 +150,20 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="px-5 space-y-6">
-        {/* Month Navigator */}
-        <MonthNavigator 
-          selectedMonth={selectedMonth}
-          onMonthChange={handleMonthChange}
+        {/* Period Navigator */}
+        <PeriodNavigator 
+          selectedDate={selectedDate}
+          periodType={periodType}
+          onDateChange={handleDateChange}
+          onPeriodTypeChange={handlePeriodTypeChange}
         />
 
-        {/* Monthly Summary */}
-        <MonthlySummary 
-          total={monthlyTotal} 
+        {/* Period Summary */}
+        <PeriodSummary 
+          total={periodTotal} 
           categoryTotals={categoryTotals}
-          month={selectedMonth}
+          date={selectedDate}
+          periodType={periodType}
         />
 
         {/* Category Pie Chart */}
@@ -138,31 +175,33 @@ const Index = () => {
             <h2 className="font-display text-lg font-semibold text-foreground">
               Expenses
             </h2>
-            <div className="flex items-center gap-2">
-              <div className="flex bg-muted rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={cn(
-                    "p-2 rounded-md transition-colors",
-                    viewMode === 'list' ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('calendar')}
-                  className={cn(
-                    "p-2 rounded-md transition-colors",
-                    viewMode === 'calendar' ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <Calendar className="w-4 h-4" />
-                </button>
+            {periodType === 'month' && (
+              <div className="flex items-center gap-2">
+                <div className="flex bg-muted rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={cn(
+                      "p-2 rounded-md transition-colors",
+                      viewMode === 'list' ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('calendar')}
+                    className={cn(
+                      "p-2 rounded-md transition-colors",
+                      viewMode === 'calendar' ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Calendar className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
-          {viewMode === 'list' ? (
+          {viewMode === 'list' || periodType !== 'month' ? (
             <>
               {/* Search & Filter */}
               <div className="mb-4">
@@ -175,7 +214,7 @@ const Index = () => {
               </div>
               <div className="flex justify-between items-center mb-3">
                 <span className="text-sm text-muted-foreground">
-                  {filteredExpenses.length} of {monthlyExpenses.length} {monthlyExpenses.length === 1 ? 'item' : 'items'}
+                  {filteredExpenses.length} of {periodExpenses.length} {periodExpenses.length === 1 ? 'item' : 'items'}
                 </span>
               </div>
               <ExpenseList 
@@ -185,8 +224,8 @@ const Index = () => {
             </>
           ) : (
             <ExpenseCalendar
-              expenses={monthlyExpenses}
-              selectedMonth={selectedMonth}
+              expenses={periodExpenses}
+              selectedMonth={selectedDate}
               onDaySelect={handleDaySelect}
             />
           )}
@@ -222,7 +261,7 @@ const Index = () => {
       <DayExpensesSheet
         open={isDaySheetOpen}
         onOpenChange={setIsDaySheetOpen}
-        date={selectedDate}
+        date={selectedDayDate}
         expenses={selectedDayExpenses}
         onEditExpense={setEditingExpense}
       />
