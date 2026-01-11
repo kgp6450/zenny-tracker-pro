@@ -13,6 +13,7 @@ import { ExpenseFilter } from '@/components/ExpenseFilter';
 import { ExpenseCalendar } from '@/components/ExpenseCalendar';
 import { DayExpensesSheet } from '@/components/DayExpensesSheet';
 import { OfflineIndicator } from '@/components/OfflineIndicator';
+import { NotificationSettings } from '@/components/NotificationSettings';
 import { AuthPage } from '@/pages/AuthPage';
 import { Expense, Category } from '@/types/expense';
 import { Button } from '@/components/ui/button';
@@ -145,14 +146,17 @@ const Index = () => {
               {user.email}
             </p>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleSignOut}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <LogOut className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center gap-1">
+            <NotificationSettings />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleSignOut}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <LogOut className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
       </header>
 
