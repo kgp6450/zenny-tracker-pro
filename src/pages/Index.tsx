@@ -12,6 +12,7 @@ import { SpendingTrendsChart } from '@/components/SpendingTrendsChart';
 import { ExpenseFilter } from '@/components/ExpenseFilter';
 import { ExpenseCalendar } from '@/components/ExpenseCalendar';
 import { DayExpensesSheet } from '@/components/DayExpensesSheet';
+import { OfflineIndicator } from '@/components/OfflineIndicator';
 import { AuthPage } from '@/pages/AuthPage';
 import { Expense, Category } from '@/types/expense';
 import { Button } from '@/components/ui/button';
@@ -43,6 +44,8 @@ const Index = () => {
     getYearlyTotal,
     getCategoryTotals,
     isLoaded,
+    pendingCount,
+    isSyncing,
   } = useExpenses();
 
   // Show loading state
@@ -128,6 +131,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      {/* Offline Indicator */}
+      <OfflineIndicator pendingCount={pendingCount} isSyncing={isSyncing} />
+
       {/* Header */}
       <header className="px-5 pt-12 pb-6">
         <div className="flex items-start justify-between">
