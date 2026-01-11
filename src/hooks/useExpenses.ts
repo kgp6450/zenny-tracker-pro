@@ -2,51 +2,84 @@ import { useState, useEffect, useCallback } from 'react';
 import { Expense, Category } from '@/types/expense';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSyncQueue } from '@/hooks/useSyncQueue';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 
 export const useExpenses = () => {
   const { user } = useAuth();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const isOnline = useOnlineStatus();
+
+  const fetchExpenses = useCallback(async () => {
+    if (!user) {
+      setExpenses([]);
+      setIsLoaded(true);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('expenses')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('date', { ascending: false })
+      .order('time', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching expenses:', error);
+    } else {
+      setExpenses(
+        (data || []).map(e => ({
+          id: e.id,
+          amount: Number(e.amount),
+          category: e.category as Category,
+          date: e.date,
+          time: e.time || '12:00:00',
+          note: e.note || undefined,
+          createdAt: e.created_at,
+        }))
+      );
+    }
+    setIsLoaded(true);
+  }, [user]);
+
+  const { addToQueue, pendingCount, isSyncing } = useSyncQueue(user?.id, fetchExpenses);
 
   // Fetch expenses from Supabase
   useEffect(() => {
-    const fetchExpenses = async () => {
-      if (!user) {
-        setExpenses([]);
-        setIsLoaded(true);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('expenses')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false })
-        .order('time', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching expenses:', error);
-      } else {
-        setExpenses(
-          (data || []).map(e => ({
-            id: e.id,
-            amount: Number(e.amount),
-            category: e.category as Category,
-            date: e.date,
-            time: e.time || '12:00:00',
-            note: e.note || undefined,
-            createdAt: e.created_at,
-          }))
-        );
-      }
-      setIsLoaded(true);
-    };
-
     fetchExpenses();
-  }, [user]);
+  }, [fetchExpenses]);
 
   const addExpense = useCallback(async (expense: Omit<Expense, 'id' | 'createdAt'>) => {
     if (!user) return null;
+
+    // If offline, queue the action and add optimistically
+    if (!isOnline) {
+      const tempId = crypto.randomUUID();
+      const newExpense: Expense = {
+        id: tempId,
+        amount: expense.amount,
+        category: expense.category,
+        date: expense.date,
+        time: expense.time,
+        note: expense.note,
+        createdAt: new Date().toISOString(),
+      };
+      
+      addToQueue({
+        type: 'add',
+        payload: {
+          amount: expense.amount,
+          category: expense.category,
+          date: expense.date,
+          time: expense.time,
+          note: expense.note || null,
+        },
+      });
+      
+      setExpenses(prev => [newExpense, ...prev]);
+      return newExpense;
+    }
 
     const { data, error } = await supabase
       .from('expenses')
@@ -78,9 +111,32 @@ export const useExpenses = () => {
 
     setExpenses(prev => [newExpense, ...prev]);
     return newExpense;
-  }, [user]);
+  }, [user, isOnline, addToQueue]);
 
   const updateExpense = useCallback(async (id: string, updates: Partial<Omit<Expense, 'id' | 'createdAt'>>) => {
+    // If offline, queue the action and update optimistically
+    if (!isOnline) {
+      const currentExpense = expenses.find(e => e.id === id);
+      if (currentExpense) {
+        addToQueue({
+          type: 'update',
+          payload: {
+            id,
+            amount: updates.amount ?? currentExpense.amount,
+            category: updates.category ?? currentExpense.category,
+            date: updates.date ?? currentExpense.date,
+            time: updates.time ?? currentExpense.time,
+            note: updates.note ?? currentExpense.note ?? null,
+          },
+        });
+      }
+      
+      setExpenses(prev => prev.map(expense =>
+        expense.id === id ? { ...expense, ...updates } : expense
+      ));
+      return;
+    }
+
     const { error } = await supabase
       .from('expenses')
       .update({
@@ -100,9 +156,20 @@ export const useExpenses = () => {
     setExpenses(prev => prev.map(expense =>
       expense.id === id ? { ...expense, ...updates } : expense
     ));
-  }, []);
+  }, [isOnline, addToQueue, expenses]);
 
   const deleteExpense = useCallback(async (id: string) => {
+    // If offline, queue the action and delete optimistically
+    if (!isOnline) {
+      addToQueue({
+        type: 'delete',
+        payload: { id },
+      });
+      
+      setExpenses(prev => prev.filter(e => e.id !== id));
+      return;
+    }
+
     const { error } = await supabase
       .from('expenses')
       .delete()
@@ -114,7 +181,7 @@ export const useExpenses = () => {
     }
 
     setExpenses(prev => prev.filter(e => e.id !== id));
-  }, []);
+  }, [isOnline, addToQueue]);
 
   const getMonthlyExpenses = useCallback((month: Date = new Date()) => {
     const year = month.getFullYear();
@@ -201,5 +268,7 @@ export const useExpenses = () => {
     getYearlyTotal,
     getCategoryTotals,
     getRecentExpenses,
+    pendingCount,
+    isSyncing,
   };
 };
