@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Plus, LogOut, Calendar, List } from 'lucide-react';
+import { Plus, LogOut, Calendar, List, Eye, EyeOff } from 'lucide-react';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useAuth } from '@/contexts/AuthContext';
 import { PeriodSummary } from '@/components/PeriodSummary';
@@ -33,6 +33,14 @@ const Index = () => {
   const [selectedDayExpenses, setSelectedDayExpenses] = useState<Expense[]>([]);
   const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(null);
   const [isDaySheetOpen, setIsDaySheetOpen] = useState(false);
+  const [showEmail, setShowEmail] = useState(false);
+
+  const maskEmail = (email: string) => {
+    const [local, domain] = email.split('@');
+    if (!domain) return '••••••••';
+    const maskedLocal = local.slice(0, 2) + '••••';
+    return `${maskedLocal}@${domain}`;
+  };
   
   const { 
     expenses,
@@ -146,9 +154,22 @@ const Index = () => {
             <h1 className="font-display text-2xl font-bold text-foreground">
               Expense Tracker
             </h1>
-            <p className="text-muted-foreground text-sm mt-1">
-              Track your spending
-            </p>
+            <button 
+              onClick={() => setShowEmail(!showEmail)}
+              className="flex items-center gap-1.5 text-muted-foreground text-sm mt-1 hover:text-foreground transition-colors"
+            >
+              {showEmail ? (
+                <>
+                  <span>{user.email}</span>
+                  <EyeOff className="h-3.5 w-3.5" />
+                </>
+              ) : (
+                <>
+                  <span>{maskEmail(user.email || '')}</span>
+                  <Eye className="h-3.5 w-3.5" />
+                </>
+              )}
+            </button>
           </div>
           <div className="flex items-center gap-1">
             <NotificationSettings />
