@@ -41,10 +41,8 @@ export const ExpenseList = ({ expenses, onEdit }: ExpenseListProps) => {
     return Object.entries(groups).sort(([a], [b]) => b.localeCompare(a));
   }, [expenses]);
 
-  // Default open the first two days (Today and Yesterday typically)
-  const defaultOpenDays = useMemo(() => {
-    return groupedExpenses.slice(0, 2).map(([date]) => date);
-  }, [groupedExpenses]);
+  // Start with all sections collapsed
+  const defaultOpenDays: string[] = [];
 
   if (expenses.length === 0) {
     return (
