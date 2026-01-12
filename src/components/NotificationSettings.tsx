@@ -62,16 +62,15 @@ export const NotificationSettings = () => {
     if (!user || !isOpen) return;
     
     const fetchSubscription = async () => {
-      const { data } = await supabase
-        .from('push_subscriptions')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      // Use edge function to get subscription status (no sensitive data exposed)
+      const { data, error } = await supabase.functions.invoke('manage-push-subscription', {
+        body: { action: 'get-status' },
+      });
       
-      if (data) {
-        setIsSubscribed(true);
+      if (!error && data) {
+        setIsSubscribed(data.subscribed);
         setReminderEnabled(data.reminder_enabled);
-        setReminderTime(data.reminder_time?.slice(0, 5) || '20:00');
+        setReminderTime(data.reminder_time || '20:00');
       }
     };
 
@@ -103,21 +102,21 @@ export const NotificationSettings = () => {
 
       const subscriptionJson = subscription.toJSON();
       
-      // Save to database
-      const { error } = await supabase
-        .from('push_subscriptions')
-        .upsert({
-          user_id: user.id,
+      // Save via edge function (sensitive keys never exposed to client-side storage)
+      const { data, error } = await supabase.functions.invoke('manage-push-subscription', {
+        body: {
+          action: 'subscribe',
           endpoint: subscription.endpoint,
           p256dh: subscriptionJson.keys?.p256dh || '',
           auth: subscriptionJson.keys?.auth || '',
           reminder_time: reminderTime + ':00',
           reminder_enabled: reminderEnabled,
-        }, {
-          onConflict: 'user_id,endpoint',
-        });
+        },
+      });
 
-      if (error) throw error;
+      if (error || !data?.success) {
+        throw new Error(error?.message || 'Failed to save subscription');
+      }
 
       setIsSubscribed(true);
       toast.success('Notifications enabled!');
@@ -141,12 +140,13 @@ export const NotificationSettings = () => {
         await subscription.unsubscribe();
       }
 
-      const { error } = await supabase
-        .from('push_subscriptions')
-        .delete()
-        .eq('user_id', user.id);
+      const { data, error } = await supabase.functions.invoke('manage-push-subscription', {
+        body: { action: 'unsubscribe' },
+      });
 
-      if (error) throw error;
+      if (error || !data?.success) {
+        throw new Error(error?.message || 'Failed to unsubscribe');
+      }
 
       setIsSubscribed(false);
       toast.success('Notifications disabled');
@@ -163,15 +163,18 @@ export const NotificationSettings = () => {
     
     setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from('push_subscriptions')
-        .update({
+      const { data, error } = await supabase.functions.invoke('manage-push-subscription', {
+        body: {
+          action: 'update',
           reminder_time: reminderTime + ':00',
           reminder_enabled: reminderEnabled,
-        })
-        .eq('user_id', user.id);
+        },
+      });
 
-      if (error) throw error;
+      if (error || !data?.success) {
+        throw new Error(error?.message || 'Failed to update settings');
+      }
+      
       toast.success('Settings updated');
     } catch (error) {
       console.error('Failed to update settings:', error);
