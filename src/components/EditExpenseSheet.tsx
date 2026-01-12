@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Category, CATEGORIES, Expense } from '@/types/expense';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { haptic } from '@/hooks/useHapticFeedback';
 
 interface EditExpenseSheetProps {
   expense: Expense | null;
@@ -45,11 +46,13 @@ export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDele
 
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      haptic.error();
       setErrors({ amount: 'Please enter a valid amount' });
       return;
     }
 
-    // Trigger confirmation pulse
+    // Trigger confirmation pulse and haptic
+    haptic.success();
     setIsSubmitting(true);
     saveButtonRef.current?.classList.add('confirm-pulse');
 
@@ -70,6 +73,7 @@ export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDele
 
   const handleDelete = () => {
     if (expense) {
+      haptic.warning();
       onDelete(expense.id);
       onOpenChange(false);
     }
@@ -122,7 +126,10 @@ export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDele
                 <button
                   key={cat.value}
                   type="button"
-                  onClick={() => setCategory(cat.value)}
+                  onClick={() => {
+                    haptic.light();
+                    setCategory(cat.value);
+                  }}
                   className={cn(
                     "category-badge px-4 py-2 text-sm transition-all duration-150 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform-gpu press-effect",
                     `category-${cat.value}`,

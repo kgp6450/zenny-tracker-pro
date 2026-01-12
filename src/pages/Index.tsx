@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Plus, LogOut, Calendar, List, Eye, EyeOff } from 'lucide-react';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useAuth } from '@/contexts/AuthContext';
+import { haptic } from '@/hooks/useHapticFeedback';
 import { PeriodSummary } from '@/components/PeriodSummary';
 import { ExpenseList } from '@/components/ExpenseList';
 import { AddExpenseSheet } from '@/components/AddExpenseSheet';
@@ -136,6 +137,7 @@ const Index = () => {
   };
 
   const handleSignOut = async () => {
+    haptic.light();
     try {
       await signOut();
     } catch (error) {
@@ -302,7 +304,10 @@ const Index = () => {
 
       {/* Floating Add Button */}
       <button
-        onClick={() => setIsAddOpen(true)}
+        onClick={() => {
+          haptic.medium();
+          setIsAddOpen(true);
+        }}
         className="float-button"
         aria-label="Add expense"
       >
