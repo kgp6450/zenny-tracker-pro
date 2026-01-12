@@ -3,6 +3,7 @@ import { Expense, Category } from '@/types/expense';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSyncQueue } from '@/hooks/useSyncQueue';
+import { startOfWeek, endOfWeek } from 'date-fns';
 
 export const useExpenses = () => {
   const { user } = useAuth();
@@ -230,7 +231,6 @@ export const useExpenses = () => {
   }, []);
 
   const getWeeklyExpenses = useCallback((date: Date = new Date()) => {
-    const { startOfWeek, endOfWeek } = require('date-fns');
     const weekStart = startOfWeek(date, { weekStartsOn: 1 });
     const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
 
