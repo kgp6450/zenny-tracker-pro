@@ -44,13 +44,13 @@ export const ExpenseList = ({ expenses, onEdit }: ExpenseListProps) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {groupedExpenses.map(([date, dateExpenses]) => (
-        <div key={date} className="space-y-3">
-          <h3 className="text-sm font-medium text-muted-foreground px-1">
+        <div key={date} className="space-y-1">
+          <h3 className="text-xs font-medium text-muted-foreground px-1 mb-2">
             {formatDateHeader(date)}
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-1">
             {dateExpenses.map(expense => (
               <ExpenseCard 
                 key={expense.id} 
