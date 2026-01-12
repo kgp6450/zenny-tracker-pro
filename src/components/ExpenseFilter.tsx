@@ -42,7 +42,7 @@ export const ExpenseFilter = ({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Search notes..."
+            placeholder="Search by note or category..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-10 h-11 bg-card"
