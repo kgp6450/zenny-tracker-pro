@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +21,8 @@ export const AddExpenseSheet = ({ open, onOpenChange, onAdd }: AddExpenseSheetPr
   const [time, setTime] = useState(format(new Date(), 'HH:mm'));
   const [note, setNote] = useState('');
   const [errors, setErrors] = useState<{ amount?: string }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +33,10 @@ export const AddExpenseSheet = ({ open, onOpenChange, onAdd }: AddExpenseSheetPr
       return;
     }
 
+    // Trigger confirmation pulse
+    setIsSubmitting(true);
+    buttonRef.current?.classList.add('confirm-pulse');
+
     onAdd({
       amount: parsedAmount,
       category,
@@ -39,14 +45,18 @@ export const AddExpenseSheet = ({ open, onOpenChange, onAdd }: AddExpenseSheetPr
       note: note.trim() || undefined,
     });
 
-    // Reset form
-    setAmount('');
-    setCategory('food');
-    setDate(format(new Date(), 'yyyy-MM-dd'));
-    setTime(format(new Date(), 'HH:mm'));
-    setNote('');
-    setErrors({});
-    onOpenChange(false);
+    // Reset form after animation
+    setTimeout(() => {
+      setAmount('');
+      setCategory('food');
+      setDate(format(new Date(), 'yyyy-MM-dd'));
+      setTime(format(new Date(), 'HH:mm'));
+      setNote('');
+      setErrors({});
+      setIsSubmitting(false);
+      buttonRef.current?.classList.remove('confirm-pulse');
+      onOpenChange(false);
+    }, 300);
   };
 
   return (
@@ -97,7 +107,7 @@ export const AddExpenseSheet = ({ open, onOpenChange, onAdd }: AddExpenseSheetPr
                   type="button"
                   onClick={() => setCategory(cat.value)}
                   className={cn(
-                    "category-badge px-4 py-2 text-sm transition-all duration-200",
+                    "category-badge px-4 py-2 text-sm transition-all duration-150 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform-gpu press-effect",
                     `category-${cat.value}`,
                     category === cat.value && "ring-2 ring-offset-2 ring-primary scale-105"
                   )}
@@ -148,8 +158,13 @@ export const AddExpenseSheet = ({ open, onOpenChange, onAdd }: AddExpenseSheetPr
           </div>
 
           {/* Submit */}
-          <Button type="submit" className="w-full h-14 text-base font-semibold">
-            Add Expense
+          <Button 
+            ref={buttonRef}
+            type="submit" 
+            className="w-full h-14 text-base font-semibold"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Adding...' : 'Add Expense'}
           </Button>
         </form>
       </SheetContent>
