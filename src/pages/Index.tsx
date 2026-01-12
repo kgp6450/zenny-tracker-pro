@@ -14,10 +14,12 @@ import { ExpenseCalendar } from '@/components/ExpenseCalendar';
 import { DayExpensesSheet } from '@/components/DayExpensesSheet';
 import { OfflineIndicator } from '@/components/OfflineIndicator';
 import { NotificationSettings } from '@/components/NotificationSettings';
+import { ExportExpenses } from '@/components/ExportExpenses';
 import { AuthPage } from '@/pages/AuthPage';
 import { Expense, Category } from '@/types/expense';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 
 const Index = () => {
   const { user, loading, signOut } = useAuth();
@@ -196,8 +198,18 @@ const Index = () => {
             <h2 className="font-display text-lg font-semibold text-foreground">
               Expenses
             </h2>
-            {periodType === 'month' && (
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <ExportExpenses 
+                expenses={filteredExpenses} 
+                periodLabel={
+                  periodType === 'week' 
+                    ? `Week of ${format(selectedDate, 'MMM d, yyyy')}`
+                    : periodType === 'month'
+                    ? format(selectedDate, 'MMMM yyyy')
+                    : format(selectedDate, 'yyyy')
+                }
+              />
+              {periodType === 'month' && (
                 <div className="flex bg-muted rounded-lg p-1">
                   <button
                     onClick={() => setViewMode('list')}
@@ -218,8 +230,8 @@ const Index = () => {
                     <Calendar className="w-4 h-4" />
                   </button>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           {viewMode === 'list' || periodType !== 'month' ? (
