@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts';
-import { format, subWeeks, subMonths, subYears, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, eachWeekOfInterval, eachMonthOfInterval, eachYearOfInterval } from 'date-fns';
+import { format, subWeeks, subMonths, subYears, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, startOfDay, endOfDay, eachWeekOfInterval, eachMonthOfInterval, eachYearOfInterval, eachDayOfInterval } from 'date-fns';
 import { Expense } from '@/types/expense';
 import { PeriodType } from './PeriodNavigator';
 
@@ -16,32 +16,60 @@ export const SpendingTrendsChart = ({ expenses, periodType, currentDate }: Spend
     
     switch (periodType) {
       case 'week': {
-        // Show last 8 weeks
-        const weeks = eachWeekOfInterval({
-          start: subWeeks(now, 7),
-          end: now,
-        }, { weekStartsOn: 1 });
+        // Show daily expenses for the selected week
+        const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+        const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+        
+        const days = eachDayOfInterval({
+          start: weekStart,
+          end: weekEnd,
+        });
 
-        return weeks.map(weekStart => {
-          const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
-          const weekExpenses = expenses.filter(e => {
+        return days.map(day => {
+          const dayStart = startOfDay(day);
+          const dayEnd = endOfDay(day);
+          const dayExpenses = expenses.filter(e => {
             const date = new Date(e.date);
-            return date >= weekStart && date <= weekEnd;
+            return date >= dayStart && date <= dayEnd;
           });
-          const total = weekExpenses.reduce((sum, e) => sum + e.amount, 0);
+          const total = dayExpenses.reduce((sum, e) => sum + e.amount, 0);
           
           return {
-            label: format(weekStart, 'MMM d'),
+            label: format(day, 'EEE'),
             total,
-            fullLabel: `${format(weekStart, 'MMM d')} - ${format(weekEnd, 'MMM d')}`,
+            fullLabel: format(day, 'EEEE, MMM d'),
           };
         });
       }
       
       case 'month': {
-        // Show last 6 months
+        // Show daily expenses for the last 30 days
+        const days = eachDayOfInterval({
+          start: subDays(now, 29),
+          end: now,
+        });
+
+        return days.map(day => {
+          const dayStart = startOfDay(day);
+          const dayEnd = endOfDay(day);
+          const dayExpenses = expenses.filter(e => {
+            const date = new Date(e.date);
+            return date >= dayStart && date <= dayEnd;
+          });
+          const total = dayExpenses.reduce((sum, e) => sum + e.amount, 0);
+          
+          return {
+            label: format(day, 'd'),
+            total,
+            fullLabel: format(day, 'EEEE, MMM d'),
+          };
+        });
+      }
+      
+      case 'year': {
+        // Show last 12 months
         const months = eachMonthOfInterval({
-          start: subMonths(now, 5),
+          start: subMonths(now, 11),
           end: now,
         });
 
@@ -57,29 +85,6 @@ export const SpendingTrendsChart = ({ expenses, periodType, currentDate }: Spend
             label: format(monthStart, 'MMM'),
             total,
             fullLabel: format(monthStart, 'MMMM yyyy'),
-          };
-        });
-      }
-      
-      case 'year': {
-        // Show last 5 years
-        const years = eachYearOfInterval({
-          start: subYears(now, 4),
-          end: now,
-        });
-
-        return years.map(yearStart => {
-          const yearEnd = endOfYear(yearStart);
-          const yearExpenses = expenses.filter(e => {
-            const date = new Date(e.date);
-            return date >= yearStart && date <= yearEnd;
-          });
-          const total = yearExpenses.reduce((sum, e) => sum + e.amount, 0);
-          
-          return {
-            label: format(yearStart, 'yyyy'),
-            total,
-            fullLabel: format(yearStart, 'yyyy'),
           };
         });
       }
@@ -107,11 +112,11 @@ export const SpendingTrendsChart = ({ expenses, periodType, currentDate }: Spend
   const getPeriodLabel = () => {
     switch (periodType) {
       case 'week':
-        return 'Last 8 Weeks';
+        return 'This Week (Daily)';
       case 'month':
-        return 'Last 6 Months';
+        return 'Last 30 Days';
       case 'year':
-        return 'Last 5 Years';
+        return 'Last 12 Months';
     }
   };
 
