@@ -12,9 +12,9 @@ export const ExpenseCard = ({ expense, onEdit }: ExpenseCardProps) => {
   return (
     <button
       onClick={() => onEdit(expense)}
-      className="expense-card flex items-center gap-3 w-full text-left py-2 press-effect"
+      className="expense-card flex items-center gap-3 w-full text-left py-2 press-effect tap-feedback transform-gpu transition-[transform,box-shadow] duration-150 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-[1.01] active:scale-[0.98] active:transition-none"
     >
-      <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm category-${expense.category} transition-transform duration-200 group-hover:scale-110`}>
+      <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm category-${expense.category} transition-transform duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110`}>
         {categoryInfo.icon}
       </div>
       

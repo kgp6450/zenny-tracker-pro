@@ -57,45 +57,47 @@ export const ExpenseList = ({ expenses, onEdit }: ExpenseListProps) => {
   }
 
   return (
-    <Accordion type="multiple" defaultValue={defaultOpenDays} className="space-y-2">
-      {groupedExpenses.map(([date, dateExpenses], index) => (
-        <AccordionItem 
-          key={date} 
-          value={date}
-          className="border rounded-xl bg-card/50 px-3 overflow-hidden transition-all duration-300 hover:shadow-md"
-          style={{ animationDelay: `${index * 50}ms` }}
-        >
-          <AccordionTrigger className="py-3 hover:no-underline transition-colors">
-            <div className="flex items-center justify-between w-full pr-2">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">{formatDateHeader(date)}</span>
-                <span className="text-xs text-muted-foreground">
-                  ({dateExpenses.length} {dateExpenses.length === 1 ? 'item' : 'items'})
+    <div className="scroll-smooth-gpu">
+      <Accordion type="multiple" defaultValue={defaultOpenDays} className="space-y-2">
+        {groupedExpenses.map(([date, dateExpenses], index) => (
+          <AccordionItem 
+            key={date} 
+            value={date}
+            className="border rounded-xl bg-card/50 px-3 overflow-hidden transition-all duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:shadow-md transform-gpu"
+            style={{ animationDelay: `${index * 50}ms` }}
+          >
+            <AccordionTrigger className="py-3 hover:no-underline transition-colors tap-feedback">
+              <div className="flex items-center justify-between w-full pr-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">{formatDateHeader(date)}</span>
+                  <span className="text-xs text-muted-foreground">
+                    ({dateExpenses.length} {dateExpenses.length === 1 ? 'item' : 'items'})
+                  </span>
+                </div>
+                <span className="text-sm font-semibold text-primary tabular-nums">
+                  ₵{getDayTotal(dateExpenses).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </span>
               </div>
-              <span className="text-sm font-semibold text-primary tabular-nums">
-                ₵{getDayTotal(dateExpenses).toLocaleString('en-US', { minimumFractionDigits: 2 })}
-              </span>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="pb-2">
-            <div className="space-y-1">
-              {dateExpenses.map((expense, expenseIndex) => (
-                <div 
-                  key={expense.id}
-                  className="animate-in"
-                  style={{ animationDelay: `${expenseIndex * 30}ms` }}
-                >
-                  <ExpenseCard 
-                    expense={expense} 
-                    onEdit={onEdit}
-                  />
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      ))}
-    </Accordion>
+            </AccordionTrigger>
+            <AccordionContent className="pb-2">
+              <div className="space-y-1">
+                {dateExpenses.map((expense, expenseIndex) => (
+                  <div 
+                    key={expense.id}
+                    className="animate-in transform-gpu"
+                    style={{ animationDelay: `${expenseIndex * 30}ms` }}
+                  >
+                    <ExpenseCard 
+                      expense={expense} 
+                      onEdit={onEdit}
+                    />
+                  </div>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </div>
   );
 };

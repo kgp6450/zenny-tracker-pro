@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,8 @@ export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDele
   const [time, setTime] = useState('12:00');
   const [note, setNote] = useState('');
   const [errors, setErrors] = useState<{ amount?: string }>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const saveButtonRef = useRef<HTMLButtonElement>(null);
 
   // Populate form when expense changes
   useEffect(() => {
@@ -47,6 +49,10 @@ export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDele
       return;
     }
 
+    // Trigger confirmation pulse
+    setIsSubmitting(true);
+    saveButtonRef.current?.classList.add('confirm-pulse');
+
     onUpdate(expense.id, {
       amount: parsedAmount,
       category,
@@ -55,7 +61,11 @@ export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDele
       note: note.trim() || undefined,
     });
 
-    onOpenChange(false);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      saveButtonRef.current?.classList.remove('confirm-pulse');
+      onOpenChange(false);
+    }, 300);
   };
 
   const handleDelete = () => {
@@ -114,7 +124,7 @@ export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDele
                   type="button"
                   onClick={() => setCategory(cat.value)}
                   className={cn(
-                    "category-badge px-4 py-2 text-sm transition-all duration-200",
+                    "category-badge px-4 py-2 text-sm transition-all duration-150 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform-gpu press-effect",
                     `category-${cat.value}`,
                     category === cat.value && "ring-2 ring-offset-2 ring-primary scale-105"
                   )}
@@ -174,8 +184,13 @@ export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDele
             >
               Delete
             </Button>
-            <Button type="submit" className="flex-1 h-14 text-base font-semibold">
-              Save Changes
+            <Button 
+              ref={saveButtonRef}
+              type="submit" 
+              className="flex-1 h-14 text-base font-semibold"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         </form>
