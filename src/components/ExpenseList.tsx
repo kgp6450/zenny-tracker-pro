@@ -3,6 +3,12 @@ import { ExpenseCard } from './ExpenseCard';
 import { Receipt } from 'lucide-react';
 import { format, isToday, isYesterday } from 'date-fns';
 import { useMemo } from 'react';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 interface ExpenseListProps {
   expenses: Expense[];
@@ -14,6 +20,10 @@ const formatDateHeader = (dateString: string): string => {
   if (isToday(date)) return 'Today';
   if (isYesterday(date)) return 'Yesterday';
   return format(date, 'EEEE, MMM d');
+};
+
+const getDayTotal = (expenses: Expense[]): number => {
+  return expenses.reduce((sum, expense) => sum + expense.amount, 0);
 };
 
 export const ExpenseList = ({ expenses, onEdit }: ExpenseListProps) => {
@@ -31,6 +41,11 @@ export const ExpenseList = ({ expenses, onEdit }: ExpenseListProps) => {
     return Object.entries(groups).sort(([a], [b]) => b.localeCompare(a));
   }, [expenses]);
 
+  // Default open the first two days (Today and Yesterday typically)
+  const defaultOpenDays = useMemo(() => {
+    return groupedExpenses.slice(0, 2).map(([date]) => date);
+  }, [groupedExpenses]);
+
   if (expenses.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
@@ -44,23 +59,39 @@ export const ExpenseList = ({ expenses, onEdit }: ExpenseListProps) => {
   }
 
   return (
-    <div className="space-y-4">
+    <Accordion type="multiple" defaultValue={defaultOpenDays} className="space-y-2">
       {groupedExpenses.map(([date, dateExpenses]) => (
-        <div key={date} className="space-y-1">
-          <h3 className="text-xs font-medium text-muted-foreground px-1 mb-2">
-            {formatDateHeader(date)}
-          </h3>
-          <div className="space-y-1">
-            {dateExpenses.map(expense => (
-              <ExpenseCard 
-                key={expense.id} 
-                expense={expense} 
-                onEdit={onEdit}
-              />
-            ))}
-          </div>
-        </div>
+        <AccordionItem 
+          key={date} 
+          value={date}
+          className="border rounded-xl bg-card/50 px-3 overflow-hidden"
+        >
+          <AccordionTrigger className="py-3 hover:no-underline">
+            <div className="flex items-center justify-between w-full pr-2">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">{formatDateHeader(date)}</span>
+                <span className="text-xs text-muted-foreground">
+                  ({dateExpenses.length} {dateExpenses.length === 1 ? 'item' : 'items'})
+                </span>
+              </div>
+              <span className="text-sm font-semibold text-primary">
+                ₵{getDayTotal(dateExpenses).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              </span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="pb-2">
+            <div className="space-y-1">
+              {dateExpenses.map(expense => (
+                <ExpenseCard 
+                  key={expense.id} 
+                  expense={expense} 
+                  onEdit={onEdit}
+                />
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
       ))}
-    </div>
+    </Accordion>
   );
 };
