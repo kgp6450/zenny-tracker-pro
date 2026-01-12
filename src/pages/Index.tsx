@@ -95,8 +95,10 @@ const Index = () => {
 
   // Filter expenses based on search query and selected categories
   const filteredExpenses = periodExpenses.filter(expense => {
+    const searchLower = searchQuery.toLowerCase();
     const matchesSearch = !searchQuery || 
-      (expense.note && expense.note.toLowerCase().includes(searchQuery.toLowerCase()));
+      (expense.note && expense.note.toLowerCase().includes(searchLower)) ||
+      expense.category.toLowerCase().includes(searchLower);
     const matchesCategory = selectedCategories.length === 0 || 
       selectedCategories.includes(expense.category);
     return matchesSearch && matchesCategory;
