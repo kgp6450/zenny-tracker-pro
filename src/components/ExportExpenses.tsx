@@ -94,23 +94,25 @@ export const ExportExpenses = ({ expenses, periodLabel }: ExportExpensesProps) =
       const doc = new jsPDF();
       
       // Title
-      doc.setFontSize(18);
+      doc.setFontSize(20);
+      doc.setFont('helvetica', 'bold');
       doc.text('Expense Report', 14, 22);
       
       // Period subtitle
       doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
       doc.setTextColor(100);
-      doc.text(periodLabel, 14, 30);
+      doc.text(periodLabel, 14, 32);
       
       // Reset text color
       doc.setTextColor(0);
 
-      // Table data
+      // Table data - use GHS instead of ₵ symbol for better PDF compatibility
       const tableData = expenses.map(expense => [
         format(new Date(expense.date), 'MMM d, yyyy'),
         expense.time?.slice(0, 5) || '12:00',
         getCategoryInfo(expense.category).label,
-        `₵${expense.amount.toFixed(2)}`,
+        `GHS ${expense.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
         expense.note || '-',
       ]);
 
@@ -118,22 +120,43 @@ export const ExportExpenses = ({ expenses, periodLabel }: ExportExpensesProps) =
 
       // Generate table
       autoTable(doc, {
-        startY: 38,
+        startY: 42,
         head: [['Date', 'Time', 'Category', 'Amount', 'Note']],
         body: tableData,
-        foot: [['', '', 'Total', `₵${total.toFixed(2)}`, '']],
-        theme: 'striped',
-        headStyles: { fillColor: [59, 130, 246] },
-        footStyles: { fillColor: [229, 231, 235], textColor: [0, 0, 0], fontStyle: 'bold' },
-        styles: { fontSize: 9 },
+        foot: [['', '', 'Total', `GHS ${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, '']],
+        theme: 'grid',
+        headStyles: { 
+          fillColor: [59, 130, 246],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          halign: 'left',
+        },
+        footStyles: { 
+          fillColor: [243, 244, 246], 
+          textColor: [0, 0, 0], 
+          fontStyle: 'bold',
+        },
+        styles: { 
+          fontSize: 10,
+          cellPadding: 4,
+        },
         columnStyles: {
-          0: { cellWidth: 30 },
-          1: { cellWidth: 20 },
-          2: { cellWidth: 30 },
-          3: { cellWidth: 25, halign: 'right' },
+          0: { cellWidth: 32 },
+          1: { cellWidth: 22 },
+          2: { cellWidth: 32 },
+          3: { cellWidth: 35, halign: 'right' },
           4: { cellWidth: 'auto' },
         },
+        alternateRowStyles: {
+          fillColor: [249, 250, 251],
+        },
       });
+
+      // Summary section
+      const finalY = (doc as any).lastAutoTable.finalY || 50;
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(`Total Expenses: ${expenses.length} items`, 14, finalY + 15);
 
       // Footer
       const pageCount = doc.getNumberOfPages();
@@ -142,7 +165,7 @@ export const ExportExpenses = ({ expenses, periodLabel }: ExportExpensesProps) =
         doc.setFontSize(8);
         doc.setTextColor(150);
         doc.text(
-          `Generated on ${format(new Date(), 'MMM d, yyyy HH:mm')} • Page ${i} of ${pageCount}`,
+          `Generated on ${format(new Date(), 'MMM d, yyyy')} at ${format(new Date(), 'HH:mm')} | Page ${i} of ${pageCount}`,
           14,
           doc.internal.pageSize.height - 10
         );
