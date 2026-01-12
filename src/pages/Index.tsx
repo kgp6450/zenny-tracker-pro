@@ -9,6 +9,7 @@ import { EditExpenseSheet } from '@/components/EditExpenseSheet';
 import { PeriodNavigator, PeriodType } from '@/components/PeriodNavigator';
 import { CategoryPieChart } from '@/components/CategoryPieChart';
 import { SpendingTrendsChart } from '@/components/SpendingTrendsChart';
+import { HistoricalTrendsChart } from '@/components/HistoricalTrendsChart';
 import { ExpenseFilter } from '@/components/ExpenseFilter';
 import { ExpenseCalendar } from '@/components/ExpenseCalendar';
 import { DayExpensesSheet } from '@/components/DayExpensesSheet';
@@ -219,6 +220,11 @@ const Index = () => {
             periodType={periodType}
             currentDate={selectedDate}
           />
+        </div>
+
+        {/* Historical Trends Chart */}
+        <div className="animate-in-delay-3">
+          <HistoricalTrendsChart expenses={expenses} />
         </div>
 
         {/* Expenses Section */}
