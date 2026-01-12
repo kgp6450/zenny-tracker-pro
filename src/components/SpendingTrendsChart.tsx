@@ -43,10 +43,13 @@ export const SpendingTrendsChart = ({ expenses, periodType, currentDate }: Spend
       }
       
       case 'month': {
-        // Show daily expenses for the last 30 days
+        // Show daily expenses starting from January 8, 2026
+        const startDate = new Date(2026, 0, 8); // January 8, 2026
+        const endDate = now > startDate ? now : startDate;
+        
         const days = eachDayOfInterval({
-          start: subDays(now, 29),
-          end: now,
+          start: startDate,
+          end: endDate,
         });
 
         return days.map(day => {
