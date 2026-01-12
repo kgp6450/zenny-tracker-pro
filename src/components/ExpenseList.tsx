@@ -58,13 +58,14 @@ export const ExpenseList = ({ expenses, onEdit }: ExpenseListProps) => {
 
   return (
     <Accordion type="multiple" defaultValue={defaultOpenDays} className="space-y-2">
-      {groupedExpenses.map(([date, dateExpenses]) => (
+      {groupedExpenses.map(([date, dateExpenses], index) => (
         <AccordionItem 
           key={date} 
           value={date}
-          className="border rounded-xl bg-card/50 px-3 overflow-hidden"
+          className="border rounded-xl bg-card/50 px-3 overflow-hidden transition-all duration-300 hover:shadow-md"
+          style={{ animationDelay: `${index * 50}ms` }}
         >
-          <AccordionTrigger className="py-3 hover:no-underline">
+          <AccordionTrigger className="py-3 hover:no-underline transition-colors">
             <div className="flex items-center justify-between w-full pr-2">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">{formatDateHeader(date)}</span>
@@ -72,19 +73,24 @@ export const ExpenseList = ({ expenses, onEdit }: ExpenseListProps) => {
                   ({dateExpenses.length} {dateExpenses.length === 1 ? 'item' : 'items'})
                 </span>
               </div>
-              <span className="text-sm font-semibold text-primary">
+              <span className="text-sm font-semibold text-primary tabular-nums">
                 ₵{getDayTotal(dateExpenses).toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </span>
             </div>
           </AccordionTrigger>
           <AccordionContent className="pb-2">
             <div className="space-y-1">
-              {dateExpenses.map(expense => (
-                <ExpenseCard 
-                  key={expense.id} 
-                  expense={expense} 
-                  onEdit={onEdit}
-                />
+              {dateExpenses.map((expense, expenseIndex) => (
+                <div 
+                  key={expense.id}
+                  className="animate-in"
+                  style={{ animationDelay: `${expenseIndex * 30}ms` }}
+                >
+                  <ExpenseCard 
+                    expense={expense} 
+                    onEdit={onEdit}
+                  />
+                </div>
               ))}
             </div>
           </AccordionContent>

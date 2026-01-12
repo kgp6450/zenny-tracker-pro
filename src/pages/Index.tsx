@@ -188,30 +188,38 @@ const Index = () => {
       {/* Main Content */}
       <main className="px-5 space-y-6">
         {/* Period Navigator */}
-        <PeriodNavigator 
-          selectedDate={selectedDate}
-          periodType={periodType}
-          onDateChange={handleDateChange}
-          onPeriodTypeChange={handlePeriodTypeChange}
-        />
+        <div className="animate-in">
+          <PeriodNavigator 
+            selectedDate={selectedDate}
+            periodType={periodType}
+            onDateChange={handleDateChange}
+            onPeriodTypeChange={handlePeriodTypeChange}
+          />
+        </div>
 
         {/* Period Summary */}
-        <PeriodSummary 
-          total={periodTotal} 
-          categoryTotals={categoryTotals}
-          date={selectedDate}
-          periodType={periodType}
-        />
+        <div className="animate-in-delay-1">
+          <PeriodSummary 
+            total={periodTotal} 
+            categoryTotals={categoryTotals}
+            date={selectedDate}
+            periodType={periodType}
+          />
+        </div>
 
         {/* Category Pie Chart */}
-        <CategoryPieChart categoryTotals={categoryTotals} />
+        <div className="animate-in-delay-2">
+          <CategoryPieChart categoryTotals={categoryTotals} />
+        </div>
 
         {/* Spending Trends Chart */}
-        <SpendingTrendsChart 
-          expenses={expenses}
-          periodType={periodType}
-          currentDate={selectedDate}
-        />
+        <div className="animate-in-delay-3">
+          <SpendingTrendsChart
+            expenses={expenses}
+            periodType={periodType}
+            currentDate={selectedDate}
+          />
+        </div>
 
         {/* Expenses Section */}
         <section>
