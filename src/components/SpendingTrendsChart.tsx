@@ -14,14 +14,17 @@ export const SpendingTrendsChart = ({ expenses, periodType, currentDate }: Spend
   const trendData = useMemo(() => {
     const now = currentDate;
     
+    const minStartDate = new Date(2026, 0, 8); // January 8, 2026
+    
     switch (periodType) {
       case 'week': {
-        // Show daily expenses for the selected week
+        // Show daily expenses for the selected week, but not before Jan 8, 2026
         const weekStart = startOfWeek(now, { weekStartsOn: 1 });
         const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+        const effectiveStart = weekStart < minStartDate ? minStartDate : weekStart;
         
         const days = eachDayOfInterval({
-          start: weekStart,
+          start: effectiveStart,
           end: weekEnd,
         });
 
@@ -44,11 +47,10 @@ export const SpendingTrendsChart = ({ expenses, periodType, currentDate }: Spend
       
       case 'month': {
         // Show daily expenses starting from January 8, 2026
-        const startDate = new Date(2026, 0, 8); // January 8, 2026
-        const endDate = now > startDate ? now : startDate;
+        const endDate = now > minStartDate ? now : minStartDate;
         
         const days = eachDayOfInterval({
-          start: startDate,
+          start: minStartDate,
           end: endDate,
         });
 
@@ -70,10 +72,11 @@ export const SpendingTrendsChart = ({ expenses, periodType, currentDate }: Spend
       }
       
       case 'year': {
-        // Show last 12 months
+        // Show months starting from January 2026
+        const yearStart = new Date(2026, 0, 1);
         const months = eachMonthOfInterval({
-          start: subMonths(now, 11),
-          end: now,
+          start: yearStart,
+          end: now > yearStart ? now : yearStart,
         });
 
         return months.map(monthStart => {
