@@ -146,8 +146,8 @@ const Index = () => {
             <h1 className="font-display text-2xl font-bold text-foreground">
               Expense Tracker
             </h1>
-            <p className="text-muted-foreground mt-1">
-              {user.email}
+            <p className="text-muted-foreground text-sm mt-1">
+              Track your spending
             </p>
           </div>
           <div className="flex items-center gap-1">
