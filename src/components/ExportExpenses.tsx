@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Download, FileText, FileSpreadsheet } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Download, FileText, FileSpreadsheet, ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -7,11 +7,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Expense, getCategoryInfo } from '@/types/expense';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Expense, Category, getCategoryInfo } from '@/types/expense';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 
 interface ExportExpensesProps {
   expenses: Expense[];
@@ -20,6 +27,8 @@ interface ExportExpensesProps {
 
 export const ExportExpenses = ({ expenses, periodLabel }: ExportExpensesProps) => {
   const [isExporting, setIsExporting] = useState(false);
+  const [showImagePreview, setShowImagePreview] = useState(false);
+  const imageRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const exportToCSV = () => {
@@ -189,29 +198,146 @@ export const ExportExpenses = ({ expenses, periodLabel }: ExportExpensesProps) =
     }
   };
 
+  const exportToImage = () => {
+    if (expenses.length === 0) {
+      toast({
+        title: "No expenses to export",
+        description: "Add some expenses first before exporting.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowImagePreview(true);
+  };
+
+  const downloadImage = async () => {
+    if (!imageRef.current) return;
+    
+    setIsExporting(true);
+    
+    try {
+      const canvas = await html2canvas(imageRef.current, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+      });
+      
+      const link = document.createElement('a');
+      link.download = `expenses-${periodLabel.replace(/\s+/g, '-').toLowerCase()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      
+      setShowImagePreview(false);
+      toast({
+        title: "Export successful",
+        description: `Exported ${expenses.length} expenses as image.`,
+      });
+    } catch (error) {
+      console.error('Image export error:', error);
+      toast({
+        title: "Export failed",
+        description: "Failed to export expenses as image.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+
+  // Group expenses by category for summary
+  const categoryTotals = expenses.reduce((acc, expense) => {
+    const cat = expense.category;
+    acc[cat] = (acc[cat] || 0) + expense.amount;
+    return acc;
+  }, {} as Record<string, number>);
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          disabled={isExporting}
-          className="gap-2"
-        >
-          <Download className="h-4 w-4" />
-          Export
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={exportToCSV} className="gap-2">
-          <FileSpreadsheet className="h-4 w-4" />
-          Export as CSV
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={exportToPDF} className="gap-2">
-          <FileText className="h-4 w-4" />
-          Export as PDF
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            disabled={isExporting}
+            className="gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Export
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={exportToCSV} className="gap-2">
+            <FileSpreadsheet className="h-4 w-4" />
+            Export as CSV
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={exportToPDF} className="gap-2">
+            <FileText className="h-4 w-4" />
+            Export as PDF
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={exportToImage} className="gap-2">
+            <ImageIcon className="h-4 w-4" />
+            Export as Image
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <Dialog open={showImagePreview} onOpenChange={setShowImagePreview}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Export as Image</DialogTitle>
+          </DialogHeader>
+          
+          <div 
+            ref={imageRef} 
+            className="bg-white p-6 rounded-lg"
+            style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+          >
+            <div className="text-center mb-4">
+              <h2 className="text-xl font-bold text-gray-900">Expense Report</h2>
+              <p className="text-sm text-gray-500">{periodLabel}</p>
+            </div>
+
+            <div className="bg-blue-50 rounded-lg p-4 mb-4 text-center">
+              <p className="text-sm text-gray-600">Total Spending</p>
+              <p className="text-2xl font-bold text-blue-600">
+                GHS {total.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              </p>
+              <p className="text-xs text-gray-500">{expenses.length} expenses</p>
+            </div>
+
+            <div className="space-y-2 mb-4">
+              <p className="text-sm font-medium text-gray-700">By Category</p>
+              {Object.entries(categoryTotals)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 5)
+                .map(([cat, amount]) => {
+                  const info = getCategoryInfo(cat as Category);
+                  return (
+                    <div key={cat} className="flex justify-between items-center text-sm">
+                      <span className="flex items-center gap-2">
+                        <span>{info.icon}</span>
+                        <span className="text-gray-700">{info.label}</span>
+                      </span>
+                      <span className="font-medium text-gray-900">
+                        GHS {amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                  );
+                })}
+            </div>
+
+            <p className="text-xs text-gray-400 text-center">
+              Generated on {format(new Date(), 'MMM d, yyyy')}
+            </p>
+          </div>
+
+          <Button onClick={downloadImage} disabled={isExporting} className="w-full">
+            <Download className="h-4 w-4 mr-2" />
+            {isExporting ? 'Generating...' : 'Download Image'}
+          </Button>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
