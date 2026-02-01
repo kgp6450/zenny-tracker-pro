@@ -17,6 +17,7 @@ import { DayExpensesSheet } from '@/components/DayExpensesSheet';
 import { OfflineIndicator } from '@/components/OfflineIndicator';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { ExportExpenses } from '@/components/ExportExpenses';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { AuthPage } from '@/pages/AuthPage';
 import { Expense, Category } from '@/types/expense';
 import { Button } from '@/components/ui/button';
@@ -175,6 +176,7 @@ const Index = () => {
             </button>
           </div>
           <div className="flex items-center gap-1">
+            <ThemeToggle />
             <NotificationSettings />
             <Button
               variant="ghost"
