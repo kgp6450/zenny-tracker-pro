@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Download, FileText, FileSpreadsheet, ImageIcon } from 'lucide-react';
+import { Download, FileText, FileSpreadsheet, ImageIcon, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Expense, Category, getCategoryInfo } from '@/types/expense';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
@@ -28,6 +29,7 @@ interface ExportExpensesProps {
 export const ExportExpenses = ({ expenses, periodLabel }: ExportExpensesProps) => {
   const [isExporting, setIsExporting] = useState(false);
   const [showImagePreview, setShowImagePreview] = useState(false);
+  const [imageTheme, setImageTheme] = useState<'light' | 'dark'>('light');
   const imageRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -217,12 +219,12 @@ export const ExportExpenses = ({ expenses, periodLabel }: ExportExpensesProps) =
     
     try {
       const canvas = await html2canvas(imageRef.current, {
-        backgroundColor: '#ffffff',
+        backgroundColor: imageTheme === 'light' ? '#ffffff' : '#1a1a2e',
         scale: 2,
       });
       
       const link = document.createElement('a');
-      link.download = `expenses-${periodLabel.replace(/\s+/g, '-').toLowerCase()}.png`;
+      link.download = `expenses-${periodLabel.replace(/\s+/g, '-').toLowerCase()}-${imageTheme}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
       
@@ -287,27 +289,64 @@ export const ExportExpenses = ({ expenses, periodLabel }: ExportExpensesProps) =
           <DialogHeader>
             <DialogTitle>Export as Image</DialogTitle>
           </DialogHeader>
+
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <span className="text-sm text-muted-foreground">Theme:</span>
+            <ToggleGroup 
+              type="single" 
+              value={imageTheme} 
+              onValueChange={(value) => value && setImageTheme(value as 'light' | 'dark')}
+              className="border rounded-lg"
+            >
+              <ToggleGroupItem value="light" aria-label="Light mode" className="gap-1.5 px-3">
+                <Sun className="h-4 w-4" />
+                Light
+              </ToggleGroupItem>
+              <ToggleGroupItem value="dark" aria-label="Dark mode" className="gap-1.5 px-3">
+                <Moon className="h-4 w-4" />
+                Dark
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
           
           <div 
             ref={imageRef} 
-            className="bg-white p-6 rounded-lg"
+            className={`p-6 rounded-lg transition-colors ${
+              imageTheme === 'light' 
+                ? 'bg-white' 
+                : 'bg-[#1a1a2e]'
+            }`}
             style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
           >
             <div className="text-center mb-4">
-              <h2 className="text-xl font-bold text-gray-900">Expense Report</h2>
-              <p className="text-sm text-gray-500">{periodLabel}</p>
+              <h2 className={`text-xl font-bold ${imageTheme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                Expense Report
+              </h2>
+              <p className={`text-sm ${imageTheme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
+                {periodLabel}
+              </p>
             </div>
 
-            <div className="bg-blue-50 rounded-lg p-4 mb-4 text-center">
-              <p className="text-sm text-gray-600">Total Spending</p>
-              <p className="text-2xl font-bold text-blue-600">
+            <div className={`rounded-lg p-4 mb-4 text-center ${
+              imageTheme === 'light' 
+                ? 'bg-blue-50' 
+                : 'bg-blue-900/30'
+            }`}>
+              <p className={`text-sm ${imageTheme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>
+                Total Spending
+              </p>
+              <p className={`text-2xl font-bold ${imageTheme === 'light' ? 'text-blue-600' : 'text-blue-400'}`}>
                 GHS {total.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </p>
-              <p className="text-xs text-gray-500">{expenses.length} expenses</p>
+              <p className={`text-xs ${imageTheme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
+                {expenses.length} expenses
+              </p>
             </div>
 
             <div className="space-y-2 mb-4">
-              <p className="text-sm font-medium text-gray-700">By Category</p>
+              <p className={`text-sm font-medium ${imageTheme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>
+                By Category
+              </p>
               {Object.entries(categoryTotals)
                 .sort(([, a], [, b]) => b - a)
                 .slice(0, 5)
@@ -317,9 +356,11 @@ export const ExportExpenses = ({ expenses, periodLabel }: ExportExpensesProps) =
                     <div key={cat} className="flex justify-between items-center text-sm">
                       <span className="flex items-center gap-2">
                         <span>{info.icon}</span>
-                        <span className="text-gray-700">{info.label}</span>
+                        <span className={imageTheme === 'light' ? 'text-gray-700' : 'text-gray-300'}>
+                          {info.label}
+                        </span>
                       </span>
-                      <span className="font-medium text-gray-900">
+                      <span className={`font-medium ${imageTheme === 'light' ? 'text-gray-900' : 'text-white'}`}>
                         GHS {amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
@@ -327,7 +368,7 @@ export const ExportExpenses = ({ expenses, periodLabel }: ExportExpensesProps) =
                 })}
             </div>
 
-            <p className="text-xs text-gray-400 text-center">
+            <p className={`text-xs text-center ${imageTheme === 'light' ? 'text-gray-400' : 'text-gray-500'}`}>
               Generated on {format(new Date(), 'MMM d, yyyy')}
             </p>
           </div>
