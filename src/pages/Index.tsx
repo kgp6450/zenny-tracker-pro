@@ -11,6 +11,7 @@ import { PeriodNavigator, PeriodType } from '@/components/PeriodNavigator';
 import { CategoryPieChart } from '@/components/CategoryPieChart';
 import { SpendingTrendsChart } from '@/components/SpendingTrendsChart';
 import { HistoricalTrendsChart } from '@/components/HistoricalTrendsChart';
+import { CashflowOverview } from '@/components/CashflowOverview';
 import { ExpenseFilter } from '@/components/ExpenseFilter';
 import { ExpenseCalendar } from '@/components/ExpenseCalendar';
 import { DayExpensesSheet } from '@/components/DayExpensesSheet';
@@ -215,6 +216,15 @@ const Index = () => {
         {/* Category Pie Chart */}
         <div className="animate-in-delay-2">
           <CategoryPieChart categoryTotals={categoryTotals} />
+        </div>
+
+        {/* Cashflow Overview */}
+        <div className="animate-in-delay-2">
+          <CashflowOverview
+            expenses={expenses}
+            periodType={periodType}
+            currentDate={selectedDate}
+          />
         </div>
 
         {/* Spending Trends Chart */}
