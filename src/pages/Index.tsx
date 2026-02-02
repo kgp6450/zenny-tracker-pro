@@ -39,7 +39,15 @@ const Index = () => {
   const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(null);
   const [isDaySheetOpen, setIsDaySheetOpen] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
-  const [isExpensesOpen, setIsExpensesOpen] = useState(false);
+  const [isExpensesOpen, setIsExpensesOpen] = useState(() => {
+    const saved = localStorage.getItem('expenses-section-open');
+    return saved !== null ? JSON.parse(saved) : false;
+  });
+
+  const handleExpensesOpenChange = (open: boolean) => {
+    setIsExpensesOpen(open);
+    localStorage.setItem('expenses-section-open', JSON.stringify(open));
+  };
 
   const maskEmail = (email: string) => {
     const [local, domain] = email.split('@');
@@ -244,7 +252,7 @@ const Index = () => {
         </div>
 
         {/* Expenses Section */}
-        <Collapsible open={isExpensesOpen} onOpenChange={setIsExpensesOpen}>
+        <Collapsible open={isExpensesOpen} onOpenChange={handleExpensesOpenChange}>
           <div className="flex items-center justify-between mb-4">
             <CollapsibleTrigger className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <h2 className="font-display text-lg font-semibold text-foreground">
