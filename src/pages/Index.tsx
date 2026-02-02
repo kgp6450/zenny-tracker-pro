@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Plus, LogOut, Calendar, List, Eye, EyeOff } from 'lucide-react';
+import { Plus, LogOut, Calendar, List, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useAuth } from '@/contexts/AuthContext';
 import { haptic } from '@/hooks/useHapticFeedback';
@@ -22,6 +22,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { AuthPage } from '@/pages/AuthPage';
 import { Expense, Category } from '@/types/expense';
 import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
@@ -38,6 +39,7 @@ const Index = () => {
   const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(null);
   const [isDaySheetOpen, setIsDaySheetOpen] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
+  const [isExpensesOpen, setIsExpensesOpen] = useState(false);
 
   const maskEmail = (email: string) => {
     const [local, domain] = email.split('@');
@@ -242,11 +244,20 @@ const Index = () => {
         </div>
 
         {/* Expenses Section */}
-        <section>
+        <Collapsible open={isExpensesOpen} onOpenChange={setIsExpensesOpen}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-lg font-semibold text-foreground">
-              Expenses
-            </h2>
+            <CollapsibleTrigger className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <h2 className="font-display text-lg font-semibold text-foreground">
+                Expenses
+              </h2>
+              <ChevronDown className={cn(
+                "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                isExpensesOpen && "rotate-180"
+              )} />
+              <span className="text-sm text-muted-foreground">
+                ({periodExpenses.length} {periodExpenses.length === 1 ? 'item' : 'items'})
+              </span>
+            </CollapsibleTrigger>
             <div className="flex items-center gap-2">
               <ExportExpenses 
                 expenses={filteredExpenses} 
@@ -283,35 +294,37 @@ const Index = () => {
             </div>
           </div>
 
-          {viewMode === 'list' || periodType !== 'month' ? (
-            <>
-              {/* Search & Filter */}
-              <div className="mb-4">
-                <ExpenseFilter
-                  searchQuery={searchQuery}
-                  onSearchChange={setSearchQuery}
-                  selectedCategories={selectedCategories}
-                  onCategoriesChange={setSelectedCategories}
+          <CollapsibleContent className="space-y-4">
+            {viewMode === 'list' || periodType !== 'month' ? (
+              <>
+                {/* Search & Filter */}
+                <div>
+                  <ExpenseFilter
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    selectedCategories={selectedCategories}
+                    onCategoriesChange={setSelectedCategories}
+                  />
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">
+                    {filteredExpenses.length} of {periodExpenses.length} {periodExpenses.length === 1 ? 'item' : 'items'}
+                  </span>
+                </div>
+                <ExpenseList 
+                  expenses={filteredExpenses} 
+                  onEdit={setEditingExpense}
                 />
-              </div>
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-sm text-muted-foreground">
-                  {filteredExpenses.length} of {periodExpenses.length} {periodExpenses.length === 1 ? 'item' : 'items'}
-                </span>
-              </div>
-              <ExpenseList 
-                expenses={filteredExpenses} 
-                onEdit={setEditingExpense}
+              </>
+            ) : (
+              <ExpenseCalendar
+                expenses={periodExpenses}
+                selectedMonth={selectedDate}
+                onDaySelect={handleDaySelect}
               />
-            </>
-          ) : (
-            <ExpenseCalendar
-              expenses={periodExpenses}
-              selectedMonth={selectedDate}
-              onDaySelect={handleDaySelect}
-            />
-          )}
-        </section>
+            )}
+          </CollapsibleContent>
+        </Collapsible>
       </main>
 
       {/* Floating Add Button */}
