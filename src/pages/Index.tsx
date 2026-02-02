@@ -30,7 +30,7 @@ const Index = () => {
   const { user, loading, signOut } = useAuth();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
-  const [selectedDate, setSelectedDate] = useState(new Date(2026, 0, 1));
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [periodType, setPeriodType] = useState<PeriodType>('month');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
