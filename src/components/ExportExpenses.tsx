@@ -218,14 +218,30 @@ export const ExportExpenses = ({ expenses, periodLabel }: ExportExpensesProps) =
     setIsExporting(true);
     
     try {
-      const canvas = await html2canvas(imageRef.current, {
+      // Clone the element to avoid layout issues on mobile
+      const element = imageRef.current;
+      
+      const canvas = await html2canvas(element, {
         backgroundColor: imageTheme === 'light' ? '#ffffff' : '#1a1a2e',
-        scale: 2,
+        scale: 3, // Higher scale for better quality on mobile
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        windowWidth: 400, // Fixed width for consistent rendering
+        windowHeight: element.scrollHeight,
+        onclone: (clonedDoc) => {
+          // Ensure the cloned element has proper dimensions
+          const clonedElement = clonedDoc.querySelector('[data-export-card]');
+          if (clonedElement) {
+            (clonedElement as HTMLElement).style.width = '360px';
+            (clonedElement as HTMLElement).style.minWidth = '360px';
+          }
+        },
       });
       
       const link = document.createElement('a');
       link.download = `expenses-${periodLabel.replace(/\s+/g, '-').toLowerCase()}-${imageTheme}.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.href = canvas.toDataURL('image/png', 1.0);
       link.click();
       
       setShowImagePreview(false);
@@ -285,7 +301,7 @@ export const ExportExpenses = ({ expenses, periodLabel }: ExportExpensesProps) =
       </DropdownMenu>
 
       <Dialog open={showImagePreview} onOpenChange={setShowImagePreview}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Export as Image</DialogTitle>
           </DialogHeader>
@@ -309,15 +325,22 @@ export const ExportExpenses = ({ expenses, periodLabel }: ExportExpensesProps) =
             </ToggleGroup>
           </div>
           
-          <div 
-            ref={imageRef} 
-            className={`p-6 rounded-lg transition-colors ${
-              imageTheme === 'light' 
-                ? 'bg-white' 
-                : 'bg-[#1a1a2e]'
-            }`}
-            style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
-          >
+          {/* Wrapper to center and constrain the export card */}
+          <div className="flex justify-center overflow-x-auto">
+            <div 
+              ref={imageRef}
+              data-export-card
+              className={`p-6 rounded-lg transition-colors shrink-0 ${
+                imageTheme === 'light' 
+                  ? 'bg-white' 
+                  : 'bg-[#1a1a2e]'
+              }`}
+              style={{ 
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                width: '360px',
+                minWidth: '360px',
+              }}
+            >
             <div className="text-center mb-4">
               <h2 className={`text-xl font-bold ${imageTheme === 'light' ? 'text-gray-900' : 'text-white'}`}>
                 Expense Report
@@ -372,6 +395,7 @@ export const ExportExpenses = ({ expenses, periodLabel }: ExportExpensesProps) =
               Generated on {format(new Date(), 'MMM d, yyyy')}
             </p>
           </div>
+        </div>
 
           <Button onClick={downloadImage} disabled={isExporting} className="w-full">
             <Download className="h-4 w-4 mr-2" />
