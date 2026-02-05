@@ -380,7 +380,7 @@ const Index = () => {
 
       {/* Footer */}
       <footer className="mt-12 pb-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} All rights reserved.
+        © {new Date().getFullYear()} Addo. All rights reserved.
       </footer>
     </div>
   );
