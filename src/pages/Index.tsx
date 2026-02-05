@@ -377,6 +377,11 @@ const Index = () => {
         expenses={selectedDayExpenses}
         onEditExpense={setEditingExpense}
       />
+
+      {/* Footer */}
+      <footer className="mt-12 pb-8 text-center text-sm text-muted-foreground">
+        © {new Date().getFullYear()} All rights reserved.
+      </footer>
     </div>
   );
 };
