@@ -1,18 +1,17 @@
-import { Category, CATEGORIES } from '@/types/expense';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { PeriodType } from './PeriodNavigator';
 
 interface PeriodSummaryProps {
   total: number;
-  categoryTotals: Record<Category, number>;
+  categoryTotals: Record<string, number>;
   date: Date;
   periodType: PeriodType;
 }
 
 export const PeriodSummary = ({ total, categoryTotals, date, periodType }: PeriodSummaryProps) => {
-  const sortedCategories = CATEGORIES
-    .map(cat => ({ ...cat, total: categoryTotals[cat.value] }))
-    .filter(cat => cat.total > 0)
+  const sortedCategories = Object.entries(categoryTotals)
+    .filter(([_, total]) => total > 0)
+    .map(([name, total]) => ({ name, total }))
     .sort((a, b) => b.total - a.total);
 
   const maxTotal = Math.max(...sortedCategories.map(c => c.total), 1);
@@ -58,12 +57,9 @@ export const PeriodSummary = ({ total, categoryTotals, date, periodType }: Perio
       {sortedCategories.length > 0 ? (
         <div className="space-y-3">
           {sortedCategories.map(category => (
-            <div key={category.value} className="space-y-1">
+            <div key={category.name} className="space-y-1">
               <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-2">
-                  <span>{category.icon}</span>
-                  <span className="opacity-90">{category.label}</span>
-                </span>
+                <span className="opacity-90">{category.name}</span>
                 <span className="font-medium">
                   ₵{category.total.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </span>

@@ -20,7 +20,7 @@ import { NotificationSettings } from '@/components/NotificationSettings';
 import { ExportExpenses } from '@/components/ExportExpenses';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { AuthPage } from '@/pages/AuthPage';
-import { Expense, Category } from '@/types/expense';
+import { Expense } from '@/types/expense';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
@@ -33,7 +33,7 @@ const Index = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [periodType, setPeriodType] = useState<PeriodType>('month');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [selectedDayExpenses, setSelectedDayExpenses] = useState<Expense[]>([]);
   const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(null);

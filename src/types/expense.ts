@@ -1,16 +1,18 @@
-export type Category = 'food' | 'transport' | 'entertainment' | 'bills' | 'other';
-
 export interface Expense {
   id: string;
   amount: number;
-  category: Category;
+  category: string;
   date: string;
   time: string;
   note?: string;
   createdAt: string;
 }
 
-export const CATEGORIES: { value: Category; label: string; icon: string }[] = [
+// Legacy type for backwards compatibility
+export type Category = 'food' | 'transport' | 'entertainment' | 'bills' | 'other' | string;
+
+// Legacy constant - kept for backwards compatibility
+export const CATEGORIES: { value: string; label: string; icon: string }[] = [
   { value: 'food', label: 'Food', icon: '🍔' },
   { value: 'transport', label: 'Transport', icon: '🚗' },
   { value: 'entertainment', label: 'Entertainment', icon: '🎬' },
@@ -18,6 +20,8 @@ export const CATEGORIES: { value: Category; label: string; icon: string }[] = [
   { value: 'other', label: 'Other', icon: '📦' },
 ];
 
-export const getCategoryInfo = (category: Category) => {
-  return CATEGORIES.find(c => c.value === category) || CATEGORIES[4];
+// Legacy function - kept for backwards compatibility
+export const getCategoryInfo = (category: string) => {
+  const found = CATEGORIES.find(c => c.value === category || c.label === category);
+  return found || { value: category, label: category, icon: '📦' };
 };

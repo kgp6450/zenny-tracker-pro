@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Expense, Category } from '@/types/expense';
+import { Expense } from '@/types/expense';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSyncQueue } from '@/hooks/useSyncQueue';
@@ -48,7 +48,7 @@ export const useExpenses = () => {
         (data || []).map(e => ({
           id: e.id,
           amount: Number(e.amount),
-          category: e.category as Category,
+          category: e.category,
           date: e.date,
           time: e.time || '12:00:00',
           note: e.note || undefined,
@@ -118,7 +118,7 @@ export const useExpenses = () => {
     const newExpense: Expense = {
       id: data.id,
       amount: Number(data.amount),
-      category: data.category as Category,
+      category: data.category,
       date: data.date,
       time: data.time || '12:00:00',
       note: data.note || undefined,
@@ -215,16 +215,14 @@ export const useExpenses = () => {
   }, [getMonthlyExpenses]);
 
   const getCategoryTotals = useCallback((expenseList: Expense[]) => {
-    const totals: Record<Category, number> = {
-      food: 0,
-      transport: 0,
-      entertainment: 0,
-      bills: 0,
-      other: 0,
-    };
+    const totals: Record<string, number> = {};
 
     expenseList.forEach(expense => {
-      totals[expense.category] += expense.amount;
+      const categoryName = expense.category;
+      if (!totals[categoryName]) {
+        totals[categoryName] = 0;
+      }
+      totals[categoryName] += expense.amount;
     });
 
     return totals;

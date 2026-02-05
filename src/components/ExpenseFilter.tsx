@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Search, X, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Category, CATEGORIES } from '@/types/expense';
 import { cn } from '@/lib/utils';
+import { useCategories } from '@/hooks/useCategories';
 
 interface ExpenseFilterProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  selectedCategories: Category[];
-  onCategoriesChange: (categories: Category[]) => void;
+  selectedCategories: string[];
+  onCategoriesChange: (categories: string[]) => void;
 }
 
 export const ExpenseFilter = ({
@@ -17,13 +17,14 @@ export const ExpenseFilter = ({
   selectedCategories,
   onCategoriesChange,
 }: ExpenseFilterProps) => {
+  const { categories } = useCategories();
   const [showFilters, setShowFilters] = useState(false);
 
-  const toggleCategory = (category: Category) => {
-    if (selectedCategories.includes(category)) {
-      onCategoriesChange(selectedCategories.filter(c => c !== category));
+  const toggleCategory = (categoryName: string) => {
+    if (selectedCategories.includes(categoryName)) {
+      onCategoriesChange(selectedCategories.filter(c => c !== categoryName));
     } else {
-      onCategoriesChange([...selectedCategories, category]);
+      onCategoriesChange([...selectedCategories, categoryName]);
     }
   };
 
@@ -59,7 +60,7 @@ export const ExpenseFilter = ({
         <button
           onClick={() => setShowFilters(!showFilters)}
           className={cn(
-            "h-11 w-11 rounded-lg flex items-center justify-center transition-colors",
+            "h-11 w-11 rounded-lg flex items-center justify-center transition-colors relative",
             showFilters || selectedCategories.length > 0
               ? "bg-primary text-primary-foreground"
               : "bg-card text-muted-foreground hover:text-foreground"
@@ -77,18 +78,17 @@ export const ExpenseFilter = ({
       {/* Category Filters */}
       {showFilters && (
         <div className="flex flex-wrap gap-2 animate-fade-in">
-          {CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <button
-              key={cat.value}
-              onClick={() => toggleCategory(cat.value)}
+              key={cat.id}
+              onClick={() => toggleCategory(cat.name)}
               className={cn(
                 "category-badge px-3 py-1.5 text-sm transition-all duration-200",
-                `category-${cat.value}`,
-                selectedCategories.includes(cat.value) && "ring-2 ring-offset-2 ring-primary"
+                selectedCategories.includes(cat.name) && "ring-2 ring-offset-2 ring-primary"
               )}
             >
               <span>{cat.icon}</span>
-              <span>{cat.label}</span>
+              <span>{cat.name}</span>
             </button>
           ))}
         </div>
