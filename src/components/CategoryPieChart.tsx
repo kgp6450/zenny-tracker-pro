@@ -1,27 +1,38 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { Category, CATEGORIES, getCategoryInfo } from '@/types/expense';
 
 interface CategoryPieChartProps {
-  categoryTotals: Record<Category, number>;
+  categoryTotals: Record<string, number>;
 }
 
-const CATEGORY_COLORS: Record<Category, string> = {
-  food: 'hsl(25, 90%, 55%)',
-  transport: 'hsl(220, 75%, 55%)',
-  entertainment: 'hsl(280, 65%, 55%)',
-  bills: 'hsl(0, 72%, 55%)',
-  other: 'hsl(168, 70%, 40%)',
+// Generate a consistent color based on category name
+const getCategoryColor = (category: string): string => {
+  const colors: Record<string, string> = {
+    'Food': 'hsl(25, 90%, 55%)',
+    'Transport': 'hsl(220, 75%, 55%)',
+    'Entertainment': 'hsl(280, 65%, 55%)',
+    'Bills': 'hsl(0, 72%, 55%)',
+    'Other': 'hsl(168, 70%, 40%)',
+  };
+  
+  if (colors[category]) return colors[category];
+  
+  // Generate color from string hash for custom categories
+  let hash = 0;
+  for (let i = 0; i < category.length; i++) {
+    hash = category.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = Math.abs(hash) % 360;
+  return `hsl(${hue}, 65%, 50%)`;
 };
 
 export const CategoryPieChart = ({ categoryTotals }: CategoryPieChartProps) => {
-  const data = CATEGORIES
-    .map(cat => ({
-      name: cat.label,
-      value: categoryTotals[cat.value],
-      icon: cat.icon,
-      category: cat.value,
-    }))
-    .filter(item => item.value > 0);
+  const data = Object.entries(categoryTotals)
+    .filter(([_, value]) => value > 0)
+    .map(([name, value]) => ({
+      name,
+      value,
+      color: getCategoryColor(name),
+    }));
 
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
@@ -42,8 +53,7 @@ export const CategoryPieChart = ({ categoryTotals }: CategoryPieChartProps) => {
       const percentage = ((data.value / total) * 100).toFixed(1);
       return (
         <div className="bg-popover border border-border rounded-lg px-3 py-2 shadow-lg">
-          <p className="font-medium text-foreground flex items-center gap-2">
-            <span>{data.icon}</span>
+          <p className="font-medium text-foreground">
             {data.name}
           </p>
           <p className="text-sm text-muted-foreground">
@@ -71,7 +81,7 @@ export const CategoryPieChart = ({ categoryTotals }: CategoryPieChartProps) => {
                 style={{ backgroundColor: entry.color }}
               />
               <span className="text-muted-foreground">
-                {item?.icon} {entry.value} ({percentage}%)
+                {entry.value} ({percentage}%)
               </span>
             </div>
           );
@@ -99,7 +109,7 @@ export const CategoryPieChart = ({ categoryTotals }: CategoryPieChartProps) => {
               {data.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
-                  fill={CATEGORY_COLORS[entry.category]}
+                  fill={entry.color}
                   className="transition-all duration-300 hover:opacity-80"
                 />
               ))}

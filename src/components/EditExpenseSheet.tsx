@@ -4,10 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Category, CATEGORIES, Expense } from '@/types/expense';
+import { Expense } from '@/types/expense';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/hooks/useHapticFeedback';
+import { useCategories } from '@/hooks/useCategories';
+import { AddCategoryDialog } from '@/components/AddCategoryDialog';
 
 interface EditExpenseSheetProps {
   expense: Expense | null;
@@ -18,8 +20,9 @@ interface EditExpenseSheetProps {
 }
 
 export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDelete }: EditExpenseSheetProps) => {
+  const { categories, addCategory } = useCategories();
   const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState<Category>('food');
+  const [category, setCategory] = useState('Food');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('12:00');
   const [note, setNote] = useState('');
@@ -122,24 +125,24 @@ export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDele
           <div className="space-y-2">
             <Label>Category</Label>
             <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map((cat) => (
+              {categories.map((cat) => (
                 <button
-                  key={cat.value}
+                  key={cat.id}
                   type="button"
                   onClick={() => {
                     haptic.light();
-                    setCategory(cat.value);
+                    setCategory(cat.name);
                   }}
                   className={cn(
                     "category-badge px-4 py-2 text-sm transition-all duration-150 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform-gpu press-effect",
-                    `category-${cat.value}`,
-                    category === cat.value && "ring-2 ring-offset-2 ring-primary scale-105"
+                    category === cat.name && "ring-2 ring-offset-2 ring-primary scale-105"
                   )}
                 >
                   <span>{cat.icon}</span>
-                  <span>{cat.label}</span>
+                  <span>{cat.name}</span>
                 </button>
               ))}
+              <AddCategoryDialog onAdd={addCategory} />
             </div>
           </div>
 

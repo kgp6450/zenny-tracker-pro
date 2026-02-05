@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { Expense, Category, getCategoryInfo } from '@/types/expense';
+import { Expense, getCategoryInfo } from '@/types/expense';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import jsPDF from 'jspdf';
@@ -374,7 +374,7 @@ export const ExportExpenses = ({ expenses, periodLabel }: ExportExpensesProps) =
                 .sort(([, a], [, b]) => b - a)
                 .slice(0, 5)
                 .map(([cat, amount]) => {
-                  const info = getCategoryInfo(cat as Category);
+                  const info = getCategoryInfo(cat);
                   return (
                     <div key={cat} className="flex justify-between items-center text-sm">
                       <span className="flex items-center gap-2">
