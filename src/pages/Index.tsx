@@ -227,7 +227,19 @@ const Index = () => {
 
         {/* Category Pie Chart */}
         <div className="animate-in-delay-2">
-          <CategoryPieChart categoryTotals={categoryTotals} />
+          <CategoryPieChart 
+            categoryTotals={categoryTotals} 
+            onCategoryClick={(categoryName) => {
+              setSelectedCategories([categoryName]);
+              if (!isExpensesOpen) {
+                handleExpensesOpenChange(true);
+              }
+              // Scroll to expenses section
+              setTimeout(() => {
+                document.querySelector('[data-expenses-section]')?.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }}
+          />
         </div>
 
         {/* Cashflow Overview */}
@@ -254,7 +266,7 @@ const Index = () => {
         </div>
 
         {/* Expenses Section */}
-        <Collapsible open={isExpensesOpen} onOpenChange={handleExpensesOpenChange}>
+        <Collapsible open={isExpensesOpen} onOpenChange={handleExpensesOpenChange} data-expenses-section>
           <div className="flex items-center justify-between mb-4">
             <CollapsibleTrigger className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <h2 className="font-display text-lg font-semibold text-foreground">

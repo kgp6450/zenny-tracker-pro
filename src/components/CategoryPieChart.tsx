@@ -2,6 +2,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 
 interface CategoryPieChartProps {
   categoryTotals: Record<string, number>;
+  onCategoryClick?: (categoryName: string) => void;
 }
 
 // Generate a consistent color based on category name
@@ -25,7 +26,7 @@ const getCategoryColor = (category: string): string => {
   return `hsl(${hue}, 65%, 50%)`;
 };
 
-export const CategoryPieChart = ({ categoryTotals }: CategoryPieChartProps) => {
+export const CategoryPieChart = ({ categoryTotals, onCategoryClick }: CategoryPieChartProps) => {
   const data = Object.entries(categoryTotals)
     .filter(([_, value]) => value > 0)
     .map(([name, value]) => ({
@@ -47,6 +48,12 @@ export const CategoryPieChart = ({ categoryTotals }: CategoryPieChartProps) => {
     );
   }
 
+  const handlePieClick = (data: any) => {
+    if (onCategoryClick && data?.name) {
+      onCategoryClick(data.name);
+    }
+  };
+
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -59,6 +66,9 @@ export const CategoryPieChart = ({ categoryTotals }: CategoryPieChartProps) => {
           <p className="text-sm text-muted-foreground">
             ₵{data.value.toLocaleString('en-US', { minimumFractionDigits: 2 })} ({percentage}%)
           </p>
+          {onCategoryClick && (
+            <p className="text-xs text-primary mt-1">Tap to view expenses</p>
+          )}
         </div>
       );
     }
@@ -72,9 +82,10 @@ export const CategoryPieChart = ({ categoryTotals }: CategoryPieChartProps) => {
           const item = data.find(d => d.name === entry.value);
           const percentage = item ? ((item.value / total) * 100).toFixed(0) : 0;
           return (
-            <div 
+            <button 
               key={`legend-${index}`}
-              className="flex items-center gap-1.5 text-xs"
+              className="flex items-center gap-1.5 text-xs hover:opacity-70 transition-opacity cursor-pointer"
+              onClick={() => onCategoryClick?.(entry.value)}
             >
               <div 
                 className="w-2.5 h-2.5 rounded-full"
@@ -83,7 +94,7 @@ export const CategoryPieChart = ({ categoryTotals }: CategoryPieChartProps) => {
               <span className="text-muted-foreground">
                 {entry.value} ({percentage}%)
               </span>
-            </div>
+            </button>
           );
         })}
       </div>
@@ -93,6 +104,7 @@ export const CategoryPieChart = ({ categoryTotals }: CategoryPieChartProps) => {
   return (
     <div className="bg-card rounded-2xl p-6 shadow-sm">
       <h3 className="font-display font-semibold text-foreground mb-2">Spending Breakdown</h3>
+      <p className="text-xs text-muted-foreground mb-2">Tap a category to view expenses</p>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -105,6 +117,8 @@ export const CategoryPieChart = ({ categoryTotals }: CategoryPieChartProps) => {
               paddingAngle={3}
               dataKey="value"
               strokeWidth={0}
+              onClick={handlePieClick}
+              style={{ cursor: onCategoryClick ? 'pointer' : 'default' }}
             >
               {data.map((entry, index) => (
                 <Cell 
