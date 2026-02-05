@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Plus, LogOut, Calendar, List, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import { useExpenses } from '@/hooks/useExpenses';
+import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/contexts/AuthContext';
 import { haptic } from '@/hooks/useHapticFeedback';
 import { PeriodSummary } from '@/components/PeriodSummary';
@@ -73,6 +74,7 @@ const Index = () => {
     isSyncing,
   } = useExpenses();
 
+  const { categories, addCategory } = useCategories();
   // Show loading state
   if (loading || !isLoaded) {
     return (
@@ -352,6 +354,8 @@ const Index = () => {
         open={isAddOpen}
         onOpenChange={setIsAddOpen}
         onAdd={addExpense}
+        categories={categories}
+        onAddCategory={addCategory}
       />
 
       {/* Edit Expense Sheet */}
@@ -361,6 +365,8 @@ const Index = () => {
         onOpenChange={(open) => !open && setEditingExpense(null)}
         onUpdate={updateExpense}
         onDelete={deleteExpense}
+        categories={categories}
+        onAddCategory={addCategory}
       />
 
       {/* Day Expenses Sheet */}

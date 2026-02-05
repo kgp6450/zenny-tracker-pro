@@ -8,8 +8,8 @@ import { Expense } from '@/types/expense';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/hooks/useHapticFeedback';
-import { useCategories } from '@/hooks/useCategories';
 import { AddCategoryDialog } from '@/components/AddCategoryDialog';
+import { CustomCategory } from '@/hooks/useCategories';
 
 interface EditExpenseSheetProps {
   expense: Expense | null;
@@ -17,10 +17,11 @@ interface EditExpenseSheetProps {
   onOpenChange: (open: boolean) => void;
   onUpdate: (id: string, updates: Partial<Omit<Expense, 'id' | 'createdAt'>>) => void;
   onDelete: (id: string) => void;
+  categories: CustomCategory[];
+  onAddCategory: (name: string, icon: string) => Promise<any>;
 }
 
-export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDelete }: EditExpenseSheetProps) => {
-  const { categories, addCategory } = useCategories();
+export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDelete, categories, onAddCategory }: EditExpenseSheetProps) => {
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('Food');
   const [date, setDate] = useState('');
@@ -142,7 +143,7 @@ export const EditExpenseSheet = ({ expense, open, onOpenChange, onUpdate, onDele
                   <span>{cat.name}</span>
                 </button>
               ))}
-              <AddCategoryDialog onAdd={addCategory} />
+              <AddCategoryDialog onAdd={onAddCategory} />
             </div>
           </div>
 

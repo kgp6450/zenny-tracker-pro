@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -23,6 +23,10 @@ export const useCategories = () => {
   const { user } = useAuth();
   const [customCategories, setCustomCategories] = useState<CustomCategory[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Use ref to avoid stale closure
+  const customCategoriesRef = useRef<CustomCategory[]>([]);
+  customCategoriesRef.current = customCategories;
 
   // Fetch custom categories from the database
   const fetchCategories = useCallback(async () => {
@@ -33,6 +37,7 @@ export const useCategories = () => {
       const { data, error } = await supabase
         .from('categories')
         .select('id, name, icon, color')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -53,7 +58,10 @@ export const useCategories = () => {
 
   // Add a new custom category
   const addCategory = useCallback(async (name: string, icon: string) => {
-    if (!user) return null;
+    if (!user) {
+      toast.error('Please sign in to add categories');
+      return null;
+    }
 
     const trimmedName = name.trim();
     if (!trimmedName) {
@@ -66,8 +74,9 @@ export const useCategories = () => {
       return null;
     }
 
-    // Check if category already exists
-    const exists = allCategories.some(
+    // Check if category already exists (use ref to get current value)
+    const currentCategories = [...DEFAULT_CATEGORIES, ...customCategoriesRef.current];
+    const exists = currentCategories.some(
       c => c.name.toLowerCase() === trimmedName.toLowerCase()
     );
     if (exists) {
@@ -100,7 +109,7 @@ export const useCategories = () => {
       }
       return null;
     }
-  }, [user, allCategories]);
+  }, [user]);
 
   // Delete a custom category
   const deleteCategory = useCallback(async (id: string) => {

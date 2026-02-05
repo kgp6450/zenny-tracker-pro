@@ -7,17 +7,18 @@ import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/hooks/useHapticFeedback';
-import { useCategories } from '@/hooks/useCategories';
 import { AddCategoryDialog } from '@/components/AddCategoryDialog';
+import { CustomCategory } from '@/hooks/useCategories';
 
 interface AddExpenseSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAdd: (expense: { amount: number; category: string; date: string; time: string; note?: string }) => void;
+  categories: CustomCategory[];
+  onAddCategory: (name: string, icon: string) => Promise<any>;
 }
 
-export const AddExpenseSheet = ({ open, onOpenChange, onAdd }: AddExpenseSheetProps) => {
-  const { categories, addCategory } = useCategories();
+export const AddExpenseSheet = ({ open, onOpenChange, onAdd, categories, onAddCategory }: AddExpenseSheetProps) => {
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('Food');
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -123,7 +124,7 @@ export const AddExpenseSheet = ({ open, onOpenChange, onAdd }: AddExpenseSheetPr
                   <span>{cat.name}</span>
                 </button>
               ))}
-              <AddCategoryDialog onAdd={addCategory} />
+              <AddCategoryDialog onAdd={onAddCategory} />
             </div>
           </div>
 
