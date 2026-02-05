@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Bell, BellOff, Clock, Loader2 } from 'lucide-react';
+import { Bell, BellOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+
 import {
   Sheet,
   SheetContent,
@@ -199,7 +199,7 @@ export const NotificationSettings = () => {
         <SheetHeader>
           <SheetTitle>Notification Settings</SheetTitle>
           <SheetDescription>
-            Get daily reminders to log your expenses
+            Get hourly reminders to log your expenses
           </SheetDescription>
         </SheetHeader>
 
@@ -219,15 +219,15 @@ export const NotificationSettings = () => {
               ) : (
                 <Bell className="h-4 w-4 mr-2" />
               )}
-              Enable Notifications
+              Enable Hourly Notifications
             </Button>
           ) : (
             <>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Daily Reminder</Label>
+                  <Label>Hourly Reminders</Label>
                   <p className="text-sm text-muted-foreground">
-                    Get reminded to log your expenses
+                    Get reminded every hour to log expenses
                   </p>
                 </div>
                 <Switch
@@ -237,21 +237,6 @@ export const NotificationSettings = () => {
                   }}
                 />
               </div>
-
-              {reminderEnabled && (
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    Reminder Time
-                  </Label>
-                  <Input
-                    type="time"
-                    value={reminderTime}
-                    onChange={(e) => setReminderTime(e.target.value)}
-                    className="w-full"
-                  />
-                </div>
-              )}
 
               <div className="flex gap-2">
                 <Button
