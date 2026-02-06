@@ -4,10 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { ArrowLeft } from 'lucide-react';
 
 export const AuthPage = () => {
-  const { signInWithApple, signInWithEmail, signUpWithEmail, loading } = useAuth();
+  const { signInWithApple, signInWithEmail, signUpWithEmail, resetPassword, loading } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,7 +45,7 @@ export const AuthPage = () => {
             toast.error(error.message);
           }
         } else {
-          toast.success('Account created! You can now sign in.');
+          toast.success('Account created! Check your email to verify your account.');
           setIsSignUp(false);
           setPassword('');
         }
@@ -61,6 +63,79 @@ export const AuthPage = () => {
       setIsSubmitting(false);
     }
   };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      toast.error('Please enter your email address');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await resetPassword(email);
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success('Password reset link sent! Check your email.');
+        setIsForgotPassword(false);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Forgot Password View
+  if (isForgotPassword) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-5">
+        <div className="w-full max-w-sm space-y-8">
+          <div className="text-center">
+            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-6">
+              <span className="text-3xl">📧</span>
+            </div>
+            <h1 className="font-display text-2xl font-bold text-foreground">
+              Reset Password
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Enter your email and we'll send you a reset link
+            </p>
+          </div>
+
+          <div className="bg-card rounded-2xl p-6 shadow-lg">
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="reset-email">Email</Label>
+                <Input
+                  id="reset-email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isSubmitting}
+                />
+              </div>
+              <Button
+                type="submit"
+                disabled={loading || isSubmitting}
+                className="w-full h-12 text-base font-semibold"
+              >
+                {isSubmitting ? 'Sending...' : 'Send Reset Link'}
+              </Button>
+            </form>
+          </div>
+
+          <button
+            onClick={() => setIsForgotPassword(false)}
+            className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors w-full"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Sign In
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-5">
@@ -142,6 +217,16 @@ export const AuthPage = () => {
             </svg>
             Sign in with Apple
           </Button>
+
+          {!isSignUp && (
+            <button
+              type="button"
+              onClick={() => setIsForgotPassword(true)}
+              className="text-sm text-primary hover:underline w-full text-right"
+            >
+              Forgot password?
+            </button>
+          )}
 
           <p className="text-center text-sm text-muted-foreground">
             {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
