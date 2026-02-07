@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Legend } from 'recharts';
-import { format, subWeeks, subMonths, subYears, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, eachWeekOfInterval, eachMonthOfInterval, eachYearOfInterval } from 'date-fns';
+import { useMemo, useState, forwardRef } from 'react';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from 'recharts';
+import { format, endOfWeek, endOfMonth, endOfYear, eachWeekOfInterval, eachMonthOfInterval, eachYearOfInterval } from 'date-fns';
 import { Expense } from '@/types/expense';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
@@ -9,6 +9,45 @@ interface HistoricalTrendsChartProps {
 }
 
 type TrendPeriod = 'weeks' | 'months' | 'years';
+
+interface TooltipData {
+  fullLabel: string;
+  total: number;
+  count: number;
+  average: number;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ payload: TooltipData }>;
+}
+
+const CustomTooltip = forwardRef<HTMLDivElement, CustomTooltipProps>(
+  ({ active, payload }, ref) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div ref={ref} className="bg-popover border border-border rounded-lg px-4 py-3 shadow-lg">
+          <p className="font-medium text-foreground text-sm mb-2">{data.fullLabel}</p>
+          <div className="space-y-1">
+            <p className="text-sm text-primary">
+              Total: ₵{data.total.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {data.count} expense{data.count !== 1 ? 's' : ''}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Avg: ₵{data.average.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            </p>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  }
+);
+
+CustomTooltip.displayName = 'CustomTooltip';
 
 export const HistoricalTrendsChart = ({ expenses }: HistoricalTrendsChartProps) => {
   const [trendPeriod, setTrendPeriod] = useState<TrendPeriod>('months');
@@ -108,29 +147,6 @@ export const HistoricalTrendsChart = ({ expenses }: HistoricalTrendsChartProps) 
   }, [trendData]);
 
   const hasData = trendData.some(d => d.total > 0);
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-popover border border-border rounded-lg px-4 py-3 shadow-lg">
-          <p className="font-medium text-foreground text-sm mb-2">{data.fullLabel}</p>
-          <div className="space-y-1">
-            <p className="text-sm text-primary">
-              Total: ₵{data.total.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {data.count} expense{data.count !== 1 ? 's' : ''}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Avg: ₵{data.average.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-            </p>
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
 
   const TrendIcon = trendPercentage > 0 ? TrendingUp : trendPercentage < 0 ? TrendingDown : Minus;
   const trendColor = trendPercentage > 0 ? 'text-destructive' : trendPercentage < 0 ? 'text-green-500' : 'text-muted-foreground';
