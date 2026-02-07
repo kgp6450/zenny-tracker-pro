@@ -86,7 +86,7 @@ export const useExpenses = () => {
         type: 'add',
         payload: {
           amount: expense.amount,
-          category: expense.category,
+          category: expense.category.toLowerCase(),
           date: expense.date,
           time: expense.time,
           note: expense.note || null,
@@ -102,7 +102,7 @@ export const useExpenses = () => {
       .insert({
         user_id: user.id,
         amount: expense.amount,
-        category: expense.category,
+        category: expense.category.toLowerCase(),
         date: expense.date,
         time: expense.time,
         note: expense.note || null,
@@ -139,7 +139,7 @@ export const useExpenses = () => {
           payload: {
             id,
             amount: updates.amount ?? currentExpense.amount,
-            category: updates.category ?? currentExpense.category,
+            category: (updates.category ?? currentExpense.category).toLowerCase(),
             date: updates.date ?? currentExpense.date,
             time: updates.time ?? currentExpense.time,
             note: updates.note ?? currentExpense.note ?? null,
@@ -157,7 +157,7 @@ export const useExpenses = () => {
       .from('expenses')
       .update({
         amount: updates.amount,
-        category: updates.category,
+        category: updates.category?.toLowerCase(),
         date: updates.date,
         time: updates.time,
         note: updates.note || null,
