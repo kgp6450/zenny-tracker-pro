@@ -17,49 +17,74 @@ export const ResetPasswordPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth event:', event, 'Session:', !!session);
-        if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session)) {
-          setIsValidSession(true);
-          setIsLoading(false);
-        } else if (event === 'INITIAL_SESSION' && session) {
-          // User already has a valid session (possibly from recovery link)
-          setIsValidSession(true);
-          setIsLoading(false);
-        } else if (event === 'INITIAL_SESSION' && !session) {
-          // No session, check URL for recovery tokens
-          const hashParams = new URLSearchParams(window.location.hash.substring(1));
-          const accessToken = hashParams.get('access_token');
-          const type = hashParams.get('type');
-          
-          if (accessToken && type === 'recovery') {
-            // Token in URL, Supabase will handle it
-            // Wait a bit for Supabase to process
-          } else {
+    let mounted = true;
+
+    const handlePasswordRecovery = async () => {
+      // Check if there's a recovery token in the URL hash
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+      const type = hashParams.get('type');
+
+      console.log('URL check:', { hasAccessToken: !!accessToken, type });
+
+      if (accessToken && type === 'recovery') {
+        // Set the session from the URL tokens
+        try {
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken || '',
+          });
+
+          if (error) {
+            console.error('Error setting session:', error);
+            if (mounted) {
+              setIsLoading(false);
+            }
+            return;
+          }
+
+          if (data.session && mounted) {
+            console.log('Session set successfully from recovery token');
+            setIsValidSession(true);
+            setIsLoading(false);
+            // Clear the hash from URL for cleaner UX
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+        } catch (err) {
+          console.error('Exception setting session:', err);
+          if (mounted) {
             setIsLoading(false);
           }
+        }
+      } else {
+        // No recovery token in URL, check for existing session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (mounted) {
+          if (session) {
+            setIsValidSession(true);
+          }
+          setIsLoading(false);
+        }
+      }
+    };
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log('Auth event:', event, 'Session:', !!session);
+        if (event === 'PASSWORD_RECOVERY' && session && mounted) {
+          setIsValidSession(true);
+          setIsLoading(false);
         }
       }
     );
 
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setIsValidSession(true);
-        setIsLoading(false);
-      }
-    });
-
-    // Set a timeout to prevent infinite loading
-    const timeout = setTimeout(() => {
-      setIsLoading(false);
-    }, 5000);
+    handlePasswordRecovery();
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
-      clearTimeout(timeout);
     };
   }, []);
 
