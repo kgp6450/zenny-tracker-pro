@@ -169,7 +169,9 @@ const Index = () => {
       <header className="px-5 pt-12 pb-6">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <img src={appLogo} alt="Expense Tracker" className="w-10 h-10 rounded-xl object-cover" />
+            <div className="w-10 h-10 rounded-xl bg-card shadow-sm border border-border flex items-center justify-center overflow-hidden">
+              <img src={appLogo} alt="Expense Tracker" className="w-8 h-8 object-contain" />
+            </div>
             <div>
               <h1 className="font-display text-2xl font-bold text-foreground">
                 Expense Tracker
