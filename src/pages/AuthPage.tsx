@@ -101,7 +101,9 @@ export const AuthPage = () => {
       <div className="min-h-screen bg-background flex flex-col items-center justify-center px-5">
         <div className="w-full max-w-sm space-y-8">
           <div className="text-center">
-            <img src={appLogo} alt="Expense Tracker" className="w-16 h-16 rounded-2xl mx-auto mb-6 object-cover" />
+            <div className="w-16 h-16 rounded-2xl bg-card shadow-md border border-border flex items-center justify-center mx-auto mb-6 overflow-hidden">
+              <img src={appLogo} alt="Expense Tracker" className="w-12 h-12 object-contain" />
+            </div>
             <h1 className="font-display text-2xl font-bold text-foreground">
               Reset Password
             </h1>
@@ -150,7 +152,9 @@ export const AuthPage = () => {
       <div className="w-full max-w-sm space-y-8">
         {/* Logo / Title */}
         <div className="text-center">
-          <img src={appLogo} alt="Expense Tracker" className="w-16 h-16 rounded-2xl mx-auto mb-6 object-cover" />
+          <div className="w-16 h-16 rounded-2xl bg-card shadow-md border border-border flex items-center justify-center mx-auto mb-6 overflow-hidden">
+            <img src={appLogo} alt="Expense Tracker" className="w-12 h-12 object-contain" />
+          </div>
           <h1 className="font-display text-3xl font-bold text-foreground">
             Expense Tracker
           </h1>
