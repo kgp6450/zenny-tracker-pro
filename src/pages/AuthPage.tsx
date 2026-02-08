@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { ArrowLeft } from 'lucide-react';
+import appLogo from '@/assets/app-logo.png';
 
 export const AuthPage = () => {
   const { signInWithApple, signInWithGoogle, signInWithEmail, signUpWithEmail, resetPassword, loading } = useAuth();
@@ -100,9 +101,7 @@ export const AuthPage = () => {
       <div className="min-h-screen bg-background flex flex-col items-center justify-center px-5">
         <div className="w-full max-w-sm space-y-8">
           <div className="text-center">
-            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-6">
-              <span className="text-3xl">📧</span>
-            </div>
+            <img src={appLogo} alt="Expense Tracker" className="w-16 h-16 rounded-2xl mx-auto mb-6 object-cover" />
             <h1 className="font-display text-2xl font-bold text-foreground">
               Reset Password
             </h1>
@@ -151,9 +150,7 @@ export const AuthPage = () => {
       <div className="w-full max-w-sm space-y-8">
         {/* Logo / Title */}
         <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-6">
-            <span className="text-3xl">💰</span>
-          </div>
+          <img src={appLogo} alt="Expense Tracker" className="w-16 h-16 rounded-2xl mx-auto mb-6 object-cover" />
           <h1 className="font-display text-3xl font-bold text-foreground">
             Expense Tracker
           </h1>

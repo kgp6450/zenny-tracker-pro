@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import appLogo from '@/assets/app-logo.png';
 
 const Index = () => {
   const { user, loading, signOut } = useAuth();
@@ -167,10 +168,12 @@ const Index = () => {
       {/* Header */}
       <header className="px-5 pt-12 pb-6">
         <div className="flex items-start justify-between">
-          <div>
-            <h1 className="font-display text-2xl font-bold text-foreground">
-              Expense Tracker
-            </h1>
+          <div className="flex items-center gap-3">
+            <img src={appLogo} alt="Expense Tracker" className="w-10 h-10 rounded-xl object-cover" />
+            <div>
+              <h1 className="font-display text-2xl font-bold text-foreground">
+                Expense Tracker
+              </h1>
             <button 
               onClick={() => setShowEmail(!showEmail)}
               className="flex items-center gap-1.5 text-muted-foreground text-sm mt-1 hover:text-foreground transition-colors"
@@ -187,6 +190,7 @@ const Index = () => {
                 </>
               )}
             </button>
+            </div>
           </div>
           <div className="flex items-center gap-1">
             <ThemeToggle />
