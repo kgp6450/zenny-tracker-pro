@@ -102,7 +102,7 @@ export const CategoryPieChart = ({ categoryTotals, onCategoryClick }: CategoryPi
   };
 
   return (
-    <div className="bg-card rounded-2xl p-6 shadow-sm">
+    <div className="bg-card rounded-3xl p-7 shadow-sm border border-border/50">
       <h3 className="font-display font-semibold text-foreground mb-2">Spending Breakdown</h3>
       <p className="text-xs text-muted-foreground mb-2">Tap a category to view expenses</p>
       <div className="h-64">
