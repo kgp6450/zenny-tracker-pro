@@ -13,6 +13,7 @@ import { CategoryPieChart } from '@/components/CategoryPieChart';
 import { SpendingTrendsChart } from '@/components/SpendingTrendsChart';
 import { HistoricalTrendsChart } from '@/components/HistoricalTrendsChart';
 import { CashflowOverview } from '@/components/CashflowOverview';
+import { FinancialHealthIndicators } from '@/components/FinancialHealthIndicators';
 import { ExpenseFilter } from '@/components/ExpenseFilter';
 import { ExpenseCalendar } from '@/components/ExpenseCalendar';
 import { DayExpensesSheet } from '@/components/DayExpensesSheet';
@@ -251,6 +252,15 @@ const Index = () => {
         {/* Cashflow Overview */}
         <div className="animate-in-delay-2">
           <CashflowOverview
+            expenses={expenses}
+            periodType={periodType}
+            currentDate={selectedDate}
+          />
+        </div>
+
+        {/* Financial Health Indicators */}
+        <div className="animate-in-delay-2">
+          <FinancialHealthIndicators
             expenses={expenses}
             periodType={periodType}
             currentDate={selectedDate}
