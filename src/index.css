@@ -196,14 +196,16 @@
   }
 
   .float-button {
-    @apply fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300;
+    @apply fixed bottom-7 right-7 w-15 h-15 rounded-full flex items-center justify-center transition-all duration-300;
+    width: 3.75rem;
+    height: 3.75rem;
     background: var(--gradient-primary);
-    box-shadow: var(--shadow-lg), 0 0 30px hsl(var(--primary) / 0.3);
+    box-shadow: var(--shadow-md), 0 0 24px hsl(var(--primary) / 0.2);
   }
 
   .float-button:hover {
-    transform: scale(1.1);
-    box-shadow: var(--shadow-lg), 0 0 40px hsl(var(--primary) / 0.4);
+    transform: scale(1.08);
+    box-shadow: var(--shadow-lg), 0 0 32px hsl(var(--primary) / 0.3);
   }
 
   .float-button:active {

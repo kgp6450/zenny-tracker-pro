@@ -211,7 +211,7 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="px-5 space-y-6">
+      <main className="px-5 space-y-7">
         {/* Period Navigator */}
         <div className="animate-in">
           <PeriodNavigator 
