@@ -98,7 +98,7 @@ export const PeriodNavigator = ({
       </div>
 
       {/* Date Navigation */}
-      <div className="flex items-center justify-between bg-card rounded-2xl p-2 shadow-sm">
+      <div className="flex items-center justify-between bg-card rounded-2xl p-3 shadow-sm border border-border/50">
         <Button
           variant="ghost"
           size="icon"
