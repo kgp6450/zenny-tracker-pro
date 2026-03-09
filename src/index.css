@@ -6,55 +6,55 @@
 
 @layer base {
   :root {
-    /* Warm, approachable expense tracker theme */
-    --background: 45 30% 97%;
-    --foreground: 220 25% 15%;
+    /* Calm, approachable expense tracker theme */
+    --background: 40 25% 97%;
+    --foreground: 220 20% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 25% 15%;
+    --card-foreground: 220 20% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 15%;
+    --popover-foreground: 220 20% 20%;
 
-    /* Teal/Emerald primary - trustworthy, financial */
-    --primary: 168 70% 40%;
+    /* Soft teal primary - calming, trustworthy */
+    --primary: 170 45% 45%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 168 70% 50%;
+    --primary-glow: 170 50% 55%;
 
-    --secondary: 45 25% 92%;
-    --secondary-foreground: 220 25% 25%;
+    --secondary: 40 20% 93%;
+    --secondary-foreground: 220 20% 30%;
 
-    --muted: 45 20% 94%;
-    --muted-foreground: 220 15% 50%;
+    --muted: 40 15% 95%;
+    --muted-foreground: 220 12% 55%;
 
-    --accent: 25 90% 55%;
+    --accent: 28 65% 58%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 55%;
+    --destructive: 0 55% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 45 20% 88%;
-    --input: 45 20% 88%;
-    --ring: 168 70% 40%;
+    --border: 40 15% 90%;
+    --input: 40 15% 90%;
+    --ring: 170 45% 45%;
 
     --radius: 1rem;
 
-    /* Category colors */
-    --category-food: 25 90% 55%;
-    --category-transport: 220 75% 55%;
-    --category-entertainment: 280 65% 55%;
-    --category-bills: 0 72% 55%;
-    --category-other: 168 70% 40%;
+    /* Pastel category colors */
+    --category-food: 28 65% 58%;
+    --category-transport: 220 50% 60%;
+    --category-entertainment: 270 40% 60%;
+    --category-bills: 0 50% 60%;
+    --category-other: 170 40% 50%;
 
-    /* Shadows */
-    --shadow-sm: 0 2px 8px -2px hsl(220 25% 15% / 0.08);
-    --shadow-md: 0 8px 24px -8px hsl(220 25% 15% / 0.12);
-    --shadow-lg: 0 16px 48px -12px hsl(220 25% 15% / 0.15);
+    /* Softer shadows */
+    --shadow-sm: 0 2px 12px -4px hsl(220 15% 20% / 0.06);
+    --shadow-md: 0 8px 28px -8px hsl(220 15% 20% / 0.09);
+    --shadow-lg: 0 20px 50px -16px hsl(220 15% 20% / 0.12);
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(168 70% 40%), hsl(168 70% 50%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(45 30% 98%));
-    --gradient-hero: linear-gradient(135deg, hsl(168 70% 40%) 0%, hsl(168 80% 35%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(170 45% 45%), hsl(170 50% 55%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(40 20% 98%));
+    --gradient-hero: linear-gradient(135deg, hsl(170 45% 48%) 0%, hsl(170 50% 42%) 100%);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
