@@ -127,7 +127,7 @@ export const SpendingTrendsChart = ({ expenses, periodType, currentDate }: Spend
   };
 
   return (
-    <div className="bg-card rounded-2xl p-6 shadow-sm">
+    <div className="bg-card rounded-3xl p-7 shadow-sm border border-border/50">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-display font-semibold text-foreground">Spending Trends</h3>
         <span className="text-xs text-muted-foreground">{getPeriodLabel()}</span>

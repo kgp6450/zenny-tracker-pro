@@ -152,7 +152,7 @@ export const HistoricalTrendsChart = ({ expenses }: HistoricalTrendsChartProps) 
   const trendColor = trendPercentage > 0 ? 'text-destructive' : trendPercentage < 0 ? 'text-green-500' : 'text-muted-foreground';
 
   return (
-    <div className="bg-card rounded-2xl p-6 shadow-sm">
+    <div className="bg-card rounded-3xl p-7 shadow-sm border border-border/50">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="font-display font-semibold text-foreground">Historical Trends</h3>

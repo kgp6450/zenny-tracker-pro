@@ -115,7 +115,7 @@ export const FinancialHealthIndicators = ({ expenses, periodType, currentDate }:
   };
 
   return (
-    <Card className="border-0 shadow-md bg-card">
+    <Card className="border border-border/50 shadow-sm bg-card rounded-3xl">
       <CardHeader className="pb-2">
         <CardTitle className="text-base font-semibold flex items-center justify-between">
           <div className="flex items-center gap-2">

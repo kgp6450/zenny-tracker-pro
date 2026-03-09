@@ -64,7 +64,7 @@ export const ExpenseCalendar = ({ expenses, selectedMonth, onDaySelect }: Expens
   };
 
   return (
-    <div className="bg-card rounded-2xl p-4 shadow-sm">
+    <div className="bg-card rounded-3xl p-5 shadow-sm border border-border/50">
       {/* Weekday headers */}
       <div className="grid grid-cols-7 gap-1 mb-2">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
