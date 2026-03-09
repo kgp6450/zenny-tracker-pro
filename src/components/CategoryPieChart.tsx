@@ -8,11 +8,11 @@ interface CategoryPieChartProps {
 // Generate a consistent color based on category name
 const getCategoryColor = (category: string): string => {
   const colors: Record<string, string> = {
-    'Food': 'hsl(25, 90%, 55%)',
-    'Transport': 'hsl(220, 75%, 55%)',
-    'Entertainment': 'hsl(280, 65%, 55%)',
-    'Bills': 'hsl(0, 72%, 55%)',
-    'Other': 'hsl(168, 70%, 40%)',
+    'Food': 'hsl(28, 65%, 58%)',
+    'Transport': 'hsl(220, 50%, 60%)',
+    'Entertainment': 'hsl(270, 40%, 60%)',
+    'Bills': 'hsl(0, 50%, 60%)',
+    'Other': 'hsl(170, 40%, 50%)',
   };
   
   if (colors[category]) return colors[category];
@@ -23,7 +23,7 @@ const getCategoryColor = (category: string): string => {
     hash = category.charCodeAt(i) + ((hash << 5) - hash);
   }
   const hue = Math.abs(hash) % 360;
-  return `hsl(${hue}, 65%, 50%)`;
+  return `hsl(${hue}, 45%, 58%)`;
 };
 
 export const CategoryPieChart = ({ categoryTotals, onCategoryClick }: CategoryPieChartProps) => {
