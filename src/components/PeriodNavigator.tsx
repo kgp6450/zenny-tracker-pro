@@ -80,7 +80,7 @@ export const PeriodNavigator = ({
   return (
     <div className="space-y-3">
       {/* Period Type Tabs */}
-      <div className="flex bg-muted rounded-lg p-1">
+      <div className="flex bg-muted rounded-xl p-1.5">
         {(['week', 'month', 'year'] as PeriodType[]).map((type) => (
           <button
             key={type}
