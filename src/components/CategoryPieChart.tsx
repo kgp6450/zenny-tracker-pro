@@ -39,7 +39,7 @@ export const CategoryPieChart = ({ categoryTotals, onCategoryClick }: CategoryPi
 
   if (data.length === 0) {
     return (
-      <div className="bg-card rounded-2xl p-6 shadow-sm">
+      <div className="bg-card rounded-3xl p-7 shadow-sm border border-border/50">
         <h3 className="font-display font-semibold text-foreground mb-4">Spending Breakdown</h3>
         <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
           No expenses to display
