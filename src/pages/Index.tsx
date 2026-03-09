@@ -258,6 +258,15 @@ const Index = () => {
           />
         </div>
 
+        {/* Financial Health Indicators */}
+        <div className="animate-in-delay-2">
+          <FinancialHealthIndicators
+            expenses={expenses}
+            periodType={periodType}
+            currentDate={selectedDate}
+          />
+        </div>
+
         {/* Spending Trends Chart */}
         <div className="animate-in-delay-3">
           <SpendingTrendsChart
