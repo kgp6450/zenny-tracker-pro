@@ -150,20 +150,20 @@
 
 @layer components {
   .expense-card {
-    @apply rounded-2xl p-4 transition-all duration-300;
+    @apply rounded-2xl p-5 transition-all duration-300;
     background: var(--gradient-card);
     box-shadow: var(--shadow-sm);
   }
 
   .expense-card:hover {
     box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
   }
 
   .summary-card {
-    @apply rounded-3xl p-6;
+    @apply rounded-3xl p-7;
     background: var(--gradient-hero);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
   }
 
   .category-badge {
