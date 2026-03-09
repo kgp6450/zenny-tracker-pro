@@ -13,6 +13,7 @@ import { CategoryPieChart } from '@/components/CategoryPieChart';
 import { SpendingTrendsChart } from '@/components/SpendingTrendsChart';
 import { HistoricalTrendsChart } from '@/components/HistoricalTrendsChart';
 import { CashflowOverview } from '@/components/CashflowOverview';
+import { FinancialHealthIndicators } from '@/components/FinancialHealthIndicators';
 import { ExpenseFilter } from '@/components/ExpenseFilter';
 import { ExpenseCalendar } from '@/components/ExpenseCalendar';
 import { DayExpensesSheet } from '@/components/DayExpensesSheet';
