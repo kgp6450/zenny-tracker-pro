@@ -196,7 +196,7 @@
   }
 
   .float-button {
-    @apply fixed bottom-7 right-7 w-15 h-15 rounded-full flex items-center justify-center transition-all duration-300;
+    @apply fixed bottom-7 right-7 rounded-full flex items-center justify-center transition-all duration-300;
     width: 3.75rem;
     height: 3.75rem;
     background: var(--gradient-primary);
