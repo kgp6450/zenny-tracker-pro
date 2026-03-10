@@ -196,7 +196,7 @@
   }
 
   .float-button {
-    @apply fixed bottom-7 right-7 rounded-full flex items-center justify-center transition-all duration-300;
+    @apply fixed bottom-24 right-7 rounded-full flex items-center justify-center transition-all duration-300;
     width: 3.75rem;
     height: 3.75rem;
     background: var(--gradient-primary);
@@ -210,6 +210,27 @@
 
   .float-button:active {
     transform: scale(0.95);
+  }
+
+  /* Safe area for bottom nav */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* FAB pulse animation for first-time users */
+  .fab-first-time {
+    animation: fab-pulse 2s ease-in-out 3;
+  }
+
+  @keyframes fab-pulse {
+    0%, 100% { 
+      box-shadow: var(--shadow-md), 0 0 24px hsl(var(--primary) / 0.25);
+      transform: scale(1) translateY(-2rem);
+    }
+    50% { 
+      box-shadow: var(--shadow-lg), 0 0 40px hsl(var(--primary) / 0.45);
+      transform: scale(1.08) translateY(-2rem);
+    }
   }
 }
 
