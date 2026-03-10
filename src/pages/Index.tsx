@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { Plus, LogOut, Calendar, List, Eye, EyeOff, ChevronDown } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { LogOut, Calendar, List, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/contexts/AuthContext';
@@ -21,6 +21,8 @@ import { OfflineIndicator } from '@/components/OfflineIndicator';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { ExportExpenses } from '@/components/ExportExpenses';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { BottomNav } from '@/components/BottomNav';
+import { EmptyState } from '@/components/EmptyState';
 import { AuthPage } from '@/pages/AuthPage';
 import { Expense } from '@/types/expense';
 import { Button } from '@/components/ui/button';
@@ -42,6 +44,7 @@ const Index = () => {
   const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(null);
   const [isDaySheetOpen, setIsDaySheetOpen] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'add' | 'history'>('dashboard');
   const [isExpensesOpen, setIsExpensesOpen] = useState(() => {
     const saved = localStorage.getItem('expenses-section-open');
     return saved !== null ? JSON.parse(saved) : false;
@@ -77,6 +80,9 @@ const Index = () => {
   } = useExpenses();
 
   const { categories, addCategory } = useCategories();
+
+  const isNewUser = isLoaded && expenses.length === 0;
+
   // Show loading state
   if (loading || !isLoaded) {
     return (
@@ -161,6 +167,21 @@ const Index = () => {
     }
   };
 
+  const handleTabChange = (tab: 'dashboard' | 'add' | 'history') => {
+    if (tab === 'history') {
+      setActiveTab('history');
+      if (!isExpensesOpen) {
+        handleExpensesOpenChange(true);
+      }
+      setTimeout(() => {
+        document.querySelector('[data-expenses-section]')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      setActiveTab(tab);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Offline Indicator */}
@@ -212,170 +233,174 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="px-5 space-y-7">
-        {/* Period Navigator */}
-        <div className="animate-in">
-          <PeriodNavigator 
-            selectedDate={selectedDate}
-            periodType={periodType}
-            onDateChange={handleDateChange}
-            onPeriodTypeChange={handlePeriodTypeChange}
-          />
-        </div>
-
-        {/* Period Summary */}
-        <div className="animate-in-delay-1">
-          <PeriodSummary 
-            total={periodTotal} 
-            categoryTotals={categoryTotals}
-            date={selectedDate}
-            periodType={periodType}
-          />
-        </div>
-
-        {/* Category Pie Chart */}
-        <div className="animate-in-delay-2">
-          <CategoryPieChart 
-            categoryTotals={categoryTotals} 
-            onCategoryClick={(categoryName) => {
-              setSelectedCategories([categoryName]);
-              if (!isExpensesOpen) {
-                handleExpensesOpenChange(true);
-              }
-              // Scroll to expenses section
-              setTimeout(() => {
-                document.querySelector('[data-expenses-section]')?.scrollIntoView({ behavior: 'smooth' });
-              }, 100);
-            }}
-          />
-        </div>
-
-        {/* Cashflow Overview */}
-        <div className="animate-in-delay-2">
-          <CashflowOverview
-            expenses={expenses}
-            periodType={periodType}
-            currentDate={selectedDate}
-          />
-        </div>
-
-        {/* Financial Health Indicators */}
-        <div className="animate-in-delay-2">
-          <FinancialHealthIndicators
-            expenses={expenses}
-            periodType={periodType}
-            currentDate={selectedDate}
-          />
-        </div>
-
-        {/* Spending Trends Chart */}
-        <div className="animate-in-delay-3">
-          <SpendingTrendsChart
-            expenses={expenses}
-            periodType={periodType}
-            currentDate={selectedDate}
-          />
-        </div>
-
-        {/* Historical Trends Chart */}
-        <div className="animate-in-delay-3">
-          <HistoricalTrendsChart expenses={expenses} />
-        </div>
-
-        {/* Expenses Section */}
-        <Collapsible open={isExpensesOpen} onOpenChange={handleExpensesOpenChange} data-expenses-section>
-          <div className="flex items-center justify-between mb-4">
-            <CollapsibleTrigger className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <h2 className="font-display text-lg font-semibold text-foreground">
-                Expenses
-              </h2>
-              <ChevronDown className={cn(
-                "h-4 w-4 text-muted-foreground transition-transform duration-200",
-                isExpensesOpen && "rotate-180"
-              )} />
-              <span className="text-sm text-muted-foreground">
-                ({periodExpenses.length} {periodExpenses.length === 1 ? 'item' : 'items'})
-              </span>
-            </CollapsibleTrigger>
-            <div className="flex items-center gap-2">
-              <ExportExpenses 
-                expenses={filteredExpenses} 
-                periodLabel={
-                  periodType === 'week' 
-                    ? `Week of ${format(selectedDate, 'MMM d, yyyy')}`
-                    : periodType === 'month'
-                    ? format(selectedDate, 'MMMM yyyy')
-                    : format(selectedDate, 'yyyy')
-                }
+        {/* Show empty state for new users */}
+        {isNewUser ? (
+          <EmptyState />
+        ) : (
+          <>
+            {/* Period Navigator */}
+            <div className="animate-in">
+              <PeriodNavigator 
+                selectedDate={selectedDate}
+                periodType={periodType}
+                onDateChange={handleDateChange}
+                onPeriodTypeChange={handlePeriodTypeChange}
               />
-              {periodType === 'month' && (
-                <div className="flex bg-muted rounded-lg p-1">
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={cn(
-                      "p-2 rounded-md transition-colors",
-                      viewMode === 'list' ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    <List className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('calendar')}
-                    className={cn(
-                      "p-2 rounded-md transition-colors",
-                      viewMode === 'calendar' ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    <Calendar className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
             </div>
-          </div>
 
-          <CollapsibleContent className="space-y-4">
-            {viewMode === 'list' || periodType !== 'month' ? (
-              <>
-                {/* Search & Filter */}
-                <div>
-                  <ExpenseFilter
-                    searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
-                    selectedCategories={selectedCategories}
-                    onCategoriesChange={setSelectedCategories}
-                  />
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">
-                    {filteredExpenses.length} of {periodExpenses.length} {periodExpenses.length === 1 ? 'item' : 'items'}
-                  </span>
-                </div>
-                <ExpenseList 
-                  expenses={filteredExpenses} 
-                  onEdit={setEditingExpense}
-                />
-              </>
-            ) : (
-              <ExpenseCalendar
-                expenses={periodExpenses}
-                selectedMonth={selectedDate}
-                onDaySelect={handleDaySelect}
+            {/* Period Summary */}
+            <div className="animate-in-delay-1">
+              <PeriodSummary 
+                total={periodTotal} 
+                categoryTotals={categoryTotals}
+                date={selectedDate}
+                periodType={periodType}
               />
-            )}
-          </CollapsibleContent>
-        </Collapsible>
+            </div>
+
+            {/* Category Pie Chart */}
+            <div className="animate-in-delay-2">
+              <CategoryPieChart 
+                categoryTotals={categoryTotals} 
+                onCategoryClick={(categoryName) => {
+                  setSelectedCategories([categoryName]);
+                  if (!isExpensesOpen) {
+                    handleExpensesOpenChange(true);
+                  }
+                  setTimeout(() => {
+                    document.querySelector('[data-expenses-section]')?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+              />
+            </div>
+
+            {/* Cashflow Overview */}
+            <div className="animate-in-delay-2">
+              <CashflowOverview
+                expenses={expenses}
+                periodType={periodType}
+                currentDate={selectedDate}
+              />
+            </div>
+
+            {/* Financial Health Indicators */}
+            <div className="animate-in-delay-2">
+              <FinancialHealthIndicators
+                expenses={expenses}
+                periodType={periodType}
+                currentDate={selectedDate}
+              />
+            </div>
+
+            {/* Spending Trends Chart */}
+            <div className="animate-in-delay-3">
+              <SpendingTrendsChart
+                expenses={expenses}
+                periodType={periodType}
+                currentDate={selectedDate}
+              />
+            </div>
+
+            {/* Historical Trends Chart */}
+            <div className="animate-in-delay-3">
+              <HistoricalTrendsChart expenses={expenses} />
+            </div>
+
+            {/* Expenses Section */}
+            <Collapsible open={isExpensesOpen} onOpenChange={handleExpensesOpenChange} data-expenses-section>
+              <div className="flex items-center justify-between mb-4">
+                <CollapsibleTrigger className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                  <h2 className="font-display text-lg font-semibold text-foreground">
+                    Expenses
+                  </h2>
+                  <ChevronDown className={cn(
+                    "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                    isExpensesOpen && "rotate-180"
+                  )} />
+                  <span className="text-sm text-muted-foreground">
+                    ({periodExpenses.length} {periodExpenses.length === 1 ? 'item' : 'items'})
+                  </span>
+                </CollapsibleTrigger>
+                <div className="flex items-center gap-2">
+                  <ExportExpenses 
+                    expenses={filteredExpenses} 
+                    periodLabel={
+                      periodType === 'week' 
+                        ? `Week of ${format(selectedDate, 'MMM d, yyyy')}`
+                        : periodType === 'month'
+                        ? format(selectedDate, 'MMMM yyyy')
+                        : format(selectedDate, 'yyyy')
+                    }
+                  />
+                  {periodType === 'month' && (
+                    <div className="flex bg-muted rounded-lg p-1">
+                      <button
+                        onClick={() => setViewMode('list')}
+                        className={cn(
+                          "p-2 rounded-md transition-colors",
+                          viewMode === 'list' ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        <List className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => setViewMode('calendar')}
+                        className={cn(
+                          "p-2 rounded-md transition-colors",
+                          viewMode === 'calendar' ? "bg-background shadow-sm" : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        <Calendar className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <CollapsibleContent className="space-y-4">
+                {viewMode === 'list' || periodType !== 'month' ? (
+                  <>
+                    {/* Search & Filter */}
+                    <div>
+                      <ExpenseFilter
+                        searchQuery={searchQuery}
+                        onSearchChange={setSearchQuery}
+                        selectedCategories={selectedCategories}
+                        onCategoriesChange={setSelectedCategories}
+                      />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">
+                        {filteredExpenses.length} of {periodExpenses.length} {periodExpenses.length === 1 ? 'item' : 'items'}
+                      </span>
+                    </div>
+                    <ExpenseList 
+                      expenses={filteredExpenses} 
+                      onEdit={setEditingExpense}
+                    />
+                  </>
+                ) : (
+                  <ExpenseCalendar
+                    expenses={periodExpenses}
+                    selectedMonth={selectedDate}
+                    onDaySelect={handleDaySelect}
+                  />
+                )}
+              </CollapsibleContent>
+            </Collapsible>
+          </>
+        )}
       </main>
 
-      {/* Floating Add Button */}
-      <button
-        onClick={() => {
+      {/* Bottom Navigation */}
+      <BottomNav 
+        activeTab={activeTab} 
+        onTabChange={handleTabChange}
+        onAddPress={() => {
           haptic.medium();
           setIsAddOpen(true);
         }}
-        className="float-button"
-        aria-label="Add expense"
-      >
-        <Plus className="w-6 h-6 text-primary-foreground" />
-      </button>
+      />
 
       {/* Add Expense Sheet */}
       <AddExpenseSheet
@@ -407,7 +432,7 @@ const Index = () => {
       />
 
       {/* Footer */}
-      <footer className="mt-12 pb-8 text-center text-sm text-muted-foreground">
+      <footer className="mt-12 pb-24 text-center text-sm text-muted-foreground">
         © {new Date().getFullYear()} Addo. All rights reserved.
       </footer>
     </div>
