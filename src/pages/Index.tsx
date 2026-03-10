@@ -409,6 +409,12 @@ const Index = () => {
         onAdd={addExpense}
         categories={categories}
         onAddCategory={addCategory}
+        mostUsedCategory={
+          expenses.length > 0
+            ? Object.entries(getCategoryTotals(expenses))
+                .sort(([, a], [, b]) => b - a)[0]?.[0]
+            : undefined
+        }
       />
 
       {/* Edit Expense Sheet */}
