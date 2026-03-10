@@ -146,6 +146,16 @@
     @apply transition-all duration-200 ease-out;
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* Enhanced input focus effects */
+  input:focus, textarea:focus, select:focus {
+    transform: scale(1.01);
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.12), var(--shadow-sm);
+  }
+
+  input:focus-within, .input-focus-expand:focus-within {
+    transform: scale(1.01);
+  }
 }
 
 @layer components {
