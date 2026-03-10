@@ -84,8 +84,8 @@ export const ExpenseList = ({ expenses, onEdit }: ExpenseListProps) => {
                 {dateExpenses.map((expense, expenseIndex) => (
                   <div 
                     key={expense.id}
-                    className="animate-in transform-gpu"
-                    style={{ animationDelay: `${expenseIndex * 30}ms` }}
+                    className="animate-list-item-in transform-gpu"
+                    style={{ animationDelay: `${expenseIndex * 50}ms`, opacity: 0 }}
                   >
                     <ExpenseCard 
                       expense={expense} 
