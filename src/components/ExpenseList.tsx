@@ -1,8 +1,10 @@
 import { Expense } from '@/types/expense';
 import { ExpenseCard } from './ExpenseCard';
+import { SwipeableExpenseCard } from './SwipeableExpenseCard';
 import { Receipt } from 'lucide-react';
 import { format, isToday, isYesterday } from 'date-fns';
 import { useMemo } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Accordion,
   AccordionContent,
@@ -13,6 +15,8 @@ import {
 interface ExpenseListProps {
   expenses: Expense[];
   onEdit: (expense: Expense) => void;
+  onDelete?: (id: string) => void;
+  onDuplicate?: (expense: Expense) => void;
 }
 
 const formatDateHeader = (dateString: string): string => {
