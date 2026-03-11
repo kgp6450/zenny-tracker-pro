@@ -30,7 +30,8 @@ const getDayTotal = (expenses: Expense[]): number => {
   return expenses.reduce((sum, expense) => sum + expense.amount, 0);
 };
 
-export const ExpenseList = ({ expenses, onEdit }: ExpenseListProps) => {
+export const ExpenseList = ({ expenses, onEdit, onDelete, onDuplicate }: ExpenseListProps) => {
+  const isMobile = useIsMobile();
   const groupedExpenses = useMemo(() => {
     const groups: Record<string, Expense[]> = {};
     
