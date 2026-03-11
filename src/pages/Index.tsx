@@ -391,6 +391,8 @@ const Index = () => {
                     <ExpenseList 
                       expenses={filteredExpenses} 
                       onEdit={setEditingExpense}
+                      onDelete={handleDeleteExpense}
+                      onDuplicate={handleDuplicateExpense}
                     />
                   </>
                 ) : (
