@@ -18,6 +18,7 @@ import { ExpenseFilter } from '@/components/ExpenseFilter';
 import { ExpenseCalendar } from '@/components/ExpenseCalendar';
 import { DayExpensesSheet } from '@/components/DayExpensesSheet';
 import { OfflineIndicator } from '@/components/OfflineIndicator';
+import { PullToRefresh } from '@/components/PullToRefresh';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { ExportExpenses } from '@/components/ExportExpenses';
 import { ThemeToggle } from '@/components/ThemeToggle';
