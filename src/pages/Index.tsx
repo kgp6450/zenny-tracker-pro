@@ -458,6 +458,7 @@ const Index = () => {
         © {new Date().getFullYear()} Addo. All rights reserved.
       </footer>
     </div>
+    </PullToRefresh>
   );
 };
 
