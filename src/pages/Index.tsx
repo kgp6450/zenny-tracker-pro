@@ -86,14 +86,7 @@ const Index = () => {
 
   // Show loading state
   if (loading || !isLoaded) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
+    return <SkeletonDashboard />;
   }
 
   // Show auth page if not signed in
