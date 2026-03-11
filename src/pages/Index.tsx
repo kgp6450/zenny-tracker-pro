@@ -30,6 +30,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import appLogo from '@/assets/app-logo.png';
+import { SkeletonDashboard } from '@/components/SkeletonDashboard';
 
 const Index = () => {
   const { user, loading, signOut } = useAuth();
