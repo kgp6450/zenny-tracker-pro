@@ -1,8 +1,10 @@
 import { Expense } from '@/types/expense';
 import { ExpenseCard } from './ExpenseCard';
+import { SwipeableExpenseCard } from './SwipeableExpenseCard';
 import { Receipt } from 'lucide-react';
 import { format, isToday, isYesterday } from 'date-fns';
 import { useMemo } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Accordion,
   AccordionContent,
@@ -13,6 +15,8 @@ import {
 interface ExpenseListProps {
   expenses: Expense[];
   onEdit: (expense: Expense) => void;
+  onDelete?: (id: string) => void;
+  onDuplicate?: (expense: Expense) => void;
 }
 
 const formatDateHeader = (dateString: string): string => {
@@ -26,7 +30,8 @@ const getDayTotal = (expenses: Expense[]): number => {
   return expenses.reduce((sum, expense) => sum + expense.amount, 0);
 };
 
-export const ExpenseList = ({ expenses, onEdit }: ExpenseListProps) => {
+export const ExpenseList = ({ expenses, onEdit, onDelete, onDuplicate }: ExpenseListProps) => {
+  const isMobile = useIsMobile();
   const groupedExpenses = useMemo(() => {
     const groups: Record<string, Expense[]> = {};
     
@@ -87,10 +92,19 @@ export const ExpenseList = ({ expenses, onEdit }: ExpenseListProps) => {
                     className="animate-list-item-in transform-gpu"
                     style={{ animationDelay: `${expenseIndex * 50}ms`, opacity: 0 }}
                   >
-                    <ExpenseCard 
-                      expense={expense} 
-                      onEdit={onEdit}
-                    />
+                    {isMobile && onDelete && onDuplicate ? (
+                      <SwipeableExpenseCard
+                        expense={expense}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                        onDuplicate={onDuplicate}
+                      />
+                    ) : (
+                      <ExpenseCard 
+                        expense={expense} 
+                        onEdit={onEdit}
+                      />
+                    )}
                   </div>
                 ))}
               </div>

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { LogOut, Calendar, List, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useCategories } from '@/hooks/useCategories';
@@ -18,6 +18,7 @@ import { ExpenseFilter } from '@/components/ExpenseFilter';
 import { ExpenseCalendar } from '@/components/ExpenseCalendar';
 import { DayExpensesSheet } from '@/components/DayExpensesSheet';
 import { OfflineIndicator } from '@/components/OfflineIndicator';
+import { PullToRefresh } from '@/components/PullToRefresh';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { ExportExpenses } from '@/components/ExportExpenses';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -67,7 +68,8 @@ const Index = () => {
     expenses,
     addExpense,
     updateExpense,
-    deleteExpense, 
+    deleteExpense,
+    refreshExpenses,
     getMonthlyTotal, 
     getMonthlyExpenses,
     getWeeklyExpenses,
@@ -81,6 +83,23 @@ const Index = () => {
   } = useExpenses();
 
   const { categories, addCategory } = useCategories();
+
+  const handleDuplicateExpense = useCallback(async (expense: Expense) => {
+    const today = new Date();
+    await addExpense({
+      amount: expense.amount,
+      category: expense.category,
+      date: format(today, 'yyyy-MM-dd'),
+      time: format(today, 'HH:mm:ss'),
+      note: expense.note,
+    });
+    haptic.success();
+  }, [addExpense]);
+
+  const handleDeleteExpense = useCallback(async (id: string) => {
+    await deleteExpense(id);
+    haptic.warning();
+  }, [deleteExpense]);
 
   const isNewUser = isLoaded && expenses.length === 0;
 
@@ -161,6 +180,7 @@ const Index = () => {
     }
   };
 
+
   const handleTabChange = (tab: 'dashboard' | 'add' | 'history') => {
     if (tab === 'history') {
       setActiveTab('history');
@@ -177,6 +197,7 @@ const Index = () => {
   };
 
   return (
+    <PullToRefresh onRefresh={refreshExpenses}>
     <div className="min-h-screen bg-background pb-24">
       {/* Offline Indicator */}
       <OfflineIndicator pendingCount={pendingCount} isSyncing={isSyncing} />
@@ -371,6 +392,8 @@ const Index = () => {
                     <ExpenseList 
                       expenses={filteredExpenses} 
                       onEdit={setEditingExpense}
+                      onDelete={handleDeleteExpense}
+                      onDuplicate={handleDuplicateExpense}
                     />
                   </>
                 ) : (
@@ -436,6 +459,7 @@ const Index = () => {
         © {new Date().getFullYear()} Addo. All rights reserved.
       </footer>
     </div>
+    </PullToRefresh>
   );
 };
 
