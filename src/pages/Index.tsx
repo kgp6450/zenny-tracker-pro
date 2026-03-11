@@ -196,6 +196,7 @@ const Index = () => {
   };
 
   return (
+    <PullToRefresh onRefresh={refreshExpenses}>
     <div className="min-h-screen bg-background pb-24">
       {/* Offline Indicator */}
       <OfflineIndicator pendingCount={pendingCount} isSyncing={isSyncing} />
