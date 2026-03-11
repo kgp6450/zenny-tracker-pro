@@ -84,6 +84,23 @@ const Index = () => {
 
   const { categories, addCategory } = useCategories();
 
+  const handleDuplicateExpense = useCallback(async (expense: Expense) => {
+    const today = new Date();
+    await addExpense({
+      amount: expense.amount,
+      category: expense.category,
+      date: format(today, 'yyyy-MM-dd'),
+      time: format(today, 'HH:mm:ss'),
+      note: expense.note,
+    });
+    haptic.success();
+  }, [addExpense]);
+
+  const handleDeleteExpense = useCallback(async (id: string) => {
+    await deleteExpense(id);
+    haptic.warning();
+  }, [deleteExpense]);
+
   const isNewUser = isLoaded && expenses.length === 0;
 
   // Show loading state
