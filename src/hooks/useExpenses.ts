@@ -273,6 +273,7 @@ export const useExpenses = () => {
     addExpense,
     updateExpense,
     deleteExpense,
+    refreshExpenses: fetchExpenses,
     getMonthlyExpenses,
     getMonthlyTotal,
     getWeeklyExpenses,
