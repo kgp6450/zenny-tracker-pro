@@ -92,10 +92,19 @@ export const ExpenseList = ({ expenses, onEdit, onDelete, onDuplicate }: Expense
                     className="animate-list-item-in transform-gpu"
                     style={{ animationDelay: `${expenseIndex * 50}ms`, opacity: 0 }}
                   >
-                    <ExpenseCard 
-                      expense={expense} 
-                      onEdit={onEdit}
-                    />
+                    {isMobile && onDelete && onDuplicate ? (
+                      <SwipeableExpenseCard
+                        expense={expense}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                        onDuplicate={onDuplicate}
+                      />
+                    ) : (
+                      <ExpenseCard 
+                        expense={expense} 
+                        onEdit={onEdit}
+                      />
+                    )}
                   </div>
                 ))}
               </div>
