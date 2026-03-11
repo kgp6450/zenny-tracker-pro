@@ -163,6 +163,23 @@ const Index = () => {
     }
   };
 
+  const handleDuplicateExpense = useCallback(async (expense: Expense) => {
+    const today = new Date();
+    await addExpense({
+      amount: expense.amount,
+      category: expense.category,
+      date: format(today, 'yyyy-MM-dd'),
+      time: format(today, 'HH:mm:ss'),
+      note: expense.note,
+    });
+    haptic.success();
+  }, [addExpense]);
+
+  const handleDeleteExpense = useCallback(async (id: string) => {
+    await deleteExpense(id);
+    haptic.warning();
+  }, [deleteExpense]);
+
   const handleTabChange = (tab: 'dashboard' | 'add' | 'history') => {
     if (tab === 'history') {
       setActiveTab('history');
