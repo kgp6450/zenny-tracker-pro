@@ -197,6 +197,7 @@ const Index = () => {
   };
 
   return (
+    <>
     <PullToRefresh onRefresh={refreshExpenses}>
     <div className="min-h-screen bg-background pb-24">
       {/* Offline Indicator */}
@@ -409,16 +410,6 @@ const Index = () => {
         )}
       </main>
 
-      {/* Bottom Navigation */}
-      <BottomNav 
-        activeTab={activeTab} 
-        onTabChange={handleTabChange}
-        onAddPress={() => {
-          haptic.medium();
-          setIsAddOpen(true);
-        }}
-      />
-
       {/* Add Expense Sheet */}
       <AddExpenseSheet
         open={isAddOpen}
@@ -460,6 +451,17 @@ const Index = () => {
       </footer>
     </div>
     </PullToRefresh>
+
+    {/* Bottom Navigation - Outside PullToRefresh so fixed positioning works */}
+    <BottomNav 
+      activeTab={activeTab} 
+      onTabChange={handleTabChange}
+      onAddPress={() => {
+        haptic.medium();
+        setIsAddOpen(true);
+      }}
+    />
+    </>
   );
 };
 
