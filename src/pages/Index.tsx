@@ -182,7 +182,7 @@ const Index = () => {
   };
 
 
-  const handleTabChange = (tab: 'dashboard' | 'add' | 'history') => {
+  const handleTabChange = (tab: 'dashboard' | 'add' | 'history' | 'settings') => {
     if (tab === 'history') {
       setActiveTab('history');
       if (!isExpensesOpen) {
@@ -191,11 +191,43 @@ const Index = () => {
       setTimeout(() => {
         document.querySelector('[data-expenses-section]')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
+    } else if (tab === 'settings') {
+      setActiveTab('settings');
     } else {
       setActiveTab(tab);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
+
+  // Show settings page
+  if (activeTab === 'settings') {
+    return (
+      <>
+        <SettingsPage onBack={() => setActiveTab('dashboard')} />
+        <BottomNav 
+          activeTab={activeTab} 
+          onTabChange={handleTabChange}
+          onAddPress={() => {
+            haptic.medium();
+            setIsAddOpen(true);
+          }}
+        />
+        <AddExpenseSheet
+          open={isAddOpen}
+          onOpenChange={setIsAddOpen}
+          onAdd={addExpense}
+          categories={categories}
+          onAddCategory={addCategory}
+          mostUsedCategory={
+            expenses.length > 0
+              ? Object.entries(getCategoryTotals(expenses))
+                  .sort(([, a], [, b]) => b - a)[0]?.[0]
+              : undefined
+          }
+        />
+      </>
+    );
+  }
 
   return (
     <>
