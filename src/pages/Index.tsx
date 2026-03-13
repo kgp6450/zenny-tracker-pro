@@ -47,7 +47,7 @@ const Index = () => {
   const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(null);
   const [isDaySheetOpen, setIsDaySheetOpen] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'add' | 'history'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'add' | 'history' | 'settings'>('dashboard');
   const [isExpensesOpen, setIsExpensesOpen] = useState(() => {
     const saved = localStorage.getItem('expenses-section-open');
     return saved !== null ? JSON.parse(saved) : false;
