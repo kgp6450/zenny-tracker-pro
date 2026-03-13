@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import { SettingsPage } from '@/pages/SettingsPage';
 import { LogOut, Calendar, List, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useCategories } from '@/hooks/useCategories';
@@ -46,7 +47,7 @@ const Index = () => {
   const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(null);
   const [isDaySheetOpen, setIsDaySheetOpen] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'add' | 'history'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'add' | 'history' | 'settings'>('dashboard');
   const [isExpensesOpen, setIsExpensesOpen] = useState(() => {
     const saved = localStorage.getItem('expenses-section-open');
     return saved !== null ? JSON.parse(saved) : false;
@@ -181,7 +182,7 @@ const Index = () => {
   };
 
 
-  const handleTabChange = (tab: 'dashboard' | 'add' | 'history') => {
+  const handleTabChange = (tab: 'dashboard' | 'add' | 'history' | 'settings') => {
     if (tab === 'history') {
       setActiveTab('history');
       if (!isExpensesOpen) {
@@ -190,11 +191,43 @@ const Index = () => {
       setTimeout(() => {
         document.querySelector('[data-expenses-section]')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
+    } else if (tab === 'settings') {
+      setActiveTab('settings');
     } else {
       setActiveTab(tab);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
+
+  // Show settings page
+  if (activeTab === 'settings') {
+    return (
+      <>
+        <SettingsPage onBack={() => setActiveTab('dashboard')} />
+        <BottomNav 
+          activeTab={activeTab} 
+          onTabChange={handleTabChange}
+          onAddPress={() => {
+            haptic.medium();
+            setIsAddOpen(true);
+          }}
+        />
+        <AddExpenseSheet
+          open={isAddOpen}
+          onOpenChange={setIsAddOpen}
+          onAdd={addExpense}
+          categories={categories}
+          onAddCategory={addCategory}
+          mostUsedCategory={
+            expenses.length > 0
+              ? Object.entries(getCategoryTotals(expenses))
+                  .sort(([, a], [, b]) => b - a)[0]?.[0]
+              : undefined
+          }
+        />
+      </>
+    );
+  }
 
   return (
     <>

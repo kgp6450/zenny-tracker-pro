@@ -1,10 +1,10 @@
-import { LayoutDashboard, Plus, Receipt } from 'lucide-react';
+import { LayoutDashboard, Plus, Receipt, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { haptic } from '@/hooks/useHapticFeedback';
 
 interface BottomNavProps {
-  activeTab: 'dashboard' | 'add' | 'history';
-  onTabChange: (tab: 'dashboard' | 'add' | 'history') => void;
+  activeTab: 'dashboard' | 'add' | 'history' | 'settings';
+  onTabChange: (tab: 'dashboard' | 'add' | 'history' | 'settings') => void;
   onAddPress: () => void;
 }
 
@@ -19,7 +19,7 @@ export const BottomNav = ({ activeTab, onTabChange, onAddPress }: BottomNavProps
             onTabChange('dashboard');
           }}
           className={cn(
-            "flex flex-col items-center gap-1 px-6 py-2 rounded-2xl transition-all duration-200 press-effect",
+            "flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-200 press-effect",
             activeTab === 'dashboard' 
               ? "text-primary bg-primary/10" 
               : "text-muted-foreground hover:text-foreground"
@@ -27,6 +27,23 @@ export const BottomNav = ({ activeTab, onTabChange, onAddPress }: BottomNavProps
         >
           <LayoutDashboard className="w-5 h-5" />
           <span className="text-[10px] font-medium">Dashboard</span>
+        </button>
+
+        {/* History */}
+        <button
+          onClick={() => {
+            haptic.light();
+            onTabChange('history');
+          }}
+          className={cn(
+            "flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-200 press-effect",
+            activeTab === 'history' 
+              ? "text-primary bg-primary/10" 
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Receipt className="w-5 h-5" />
+          <span className="text-[10px] font-medium">History</span>
         </button>
 
         {/* Add - Center FAB */}
@@ -45,21 +62,21 @@ export const BottomNav = ({ activeTab, onTabChange, onAddPress }: BottomNavProps
           <Plus className="w-6 h-6 text-primary-foreground" />
         </button>
 
-        {/* History */}
+        {/* Settings */}
         <button
           onClick={() => {
             haptic.light();
-            onTabChange('history');
+            onTabChange('settings');
           }}
           className={cn(
-            "flex flex-col items-center gap-1 px-6 py-2 rounded-2xl transition-all duration-200 press-effect",
-            activeTab === 'history' 
+            "flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-200 press-effect",
+            activeTab === 'settings' 
               ? "text-primary bg-primary/10" 
               : "text-muted-foreground hover:text-foreground"
           )}
         >
-          <Receipt className="w-5 h-5" />
-          <span className="text-[10px] font-medium">History</span>
+          <Settings className="w-5 h-5" />
+          <span className="text-[10px] font-medium">Settings</span>
         </button>
       </div>
     </nav>
