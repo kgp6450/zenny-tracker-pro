@@ -2,6 +2,8 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { LogOut, Calendar, List, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
+import { useIncome } from '@/hooks/useIncome';
+import { AddIncomeSheet } from '@/components/AddIncomeSheet';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/contexts/AuthContext';
