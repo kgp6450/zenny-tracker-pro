@@ -495,6 +495,7 @@ const Index = () => {
         haptic.medium();
         setIsAddOpen(true);
       }}
+      onAddIncome={() => toast.info('Income tracking coming soon!', { description: 'This feature is under development.' })}
     />
     </>
   );
