@@ -118,8 +118,8 @@ export const BottomNav = ({ activeTab, onTabChange, onAddPress, onAddIncome }: B
                 )}
                 style={{ transitionDelay: fabOpen ? '100ms' : '0ms' }}
               >
-                <div className="w-10 h-10 rounded-full bg-emerald-500/15 flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-emerald-500" />
+                <div className="w-10 h-10 rounded-full bg-accent/50 flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-primary" />
                 </div>
                 <span className="text-sm font-medium text-foreground">Add Income</span>
               </button>
