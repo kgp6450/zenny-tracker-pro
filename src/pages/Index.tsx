@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { LogOut, Calendar, List, Eye, EyeOff, ChevronDown } from 'lucide-react';
+import { toast } from 'sonner';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/contexts/AuthContext';
@@ -211,6 +212,7 @@ const Index = () => {
             haptic.medium();
             setIsAddOpen(true);
           }}
+          onAddIncome={() => toast.info('Income tracking coming soon!', { description: 'This feature is under development.' })}
         />
         <AddExpenseSheet
           open={isAddOpen}
@@ -493,6 +495,7 @@ const Index = () => {
         haptic.medium();
         setIsAddOpen(true);
       }}
+      onAddIncome={() => toast.info('Income tracking coming soon!', { description: 'This feature is under development.' })}
     />
     </>
   );
