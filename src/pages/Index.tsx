@@ -40,6 +40,7 @@ import { SkeletonDashboard } from '@/components/SkeletonDashboard';
 const Index = () => {
   const { user, loading, signOut } = useAuth();
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isIncomeOpen, setIsIncomeOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [periodType, setPeriodType] = useState<PeriodType>('month');
