@@ -2,6 +2,8 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { LogOut, Calendar, List, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
+import { useIncome } from '@/hooks/useIncome';
+import { AddIncomeSheet } from '@/components/AddIncomeSheet';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/contexts/AuthContext';
@@ -38,6 +40,7 @@ import { SkeletonDashboard } from '@/components/SkeletonDashboard';
 const Index = () => {
   const { user, loading, signOut } = useAuth();
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isIncomeOpen, setIsIncomeOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [periodType, setPeriodType] = useState<PeriodType>('month');
@@ -85,6 +88,7 @@ const Index = () => {
   } = useExpenses();
 
   const { categories, addCategory } = useCategories();
+  const { addIncome } = useIncome();
 
   const handleDuplicateExpense = useCallback(async (expense: Expense) => {
     const today = new Date();
@@ -212,7 +216,7 @@ const Index = () => {
             haptic.medium();
             setIsAddOpen(true);
           }}
-          onAddIncome={() => toast.info('Income tracking coming soon!', { description: 'This feature is under development.' })}
+          onAddIncome={() => setIsIncomeOpen(true)}
         />
         <AddExpenseSheet
           open={isAddOpen}
@@ -226,6 +230,11 @@ const Index = () => {
                   .sort(([, a], [, b]) => b - a)[0]?.[0]
               : undefined
           }
+        />
+        <AddIncomeSheet
+          open={isIncomeOpen}
+          onOpenChange={setIsIncomeOpen}
+          onAdd={addIncome}
         />
       </>
     );
@@ -495,7 +504,12 @@ const Index = () => {
         haptic.medium();
         setIsAddOpen(true);
       }}
-      onAddIncome={() => toast.info('Income tracking coming soon!', { description: 'This feature is under development.' })}
+      onAddIncome={() => setIsIncomeOpen(true)}
+    />
+    <AddIncomeSheet
+      open={isIncomeOpen}
+      onOpenChange={setIsIncomeOpen}
+      onAdd={addIncome}
     />
     </>
   );
