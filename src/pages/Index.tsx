@@ -231,6 +231,11 @@ const Index = () => {
               : undefined
           }
         />
+        <AddIncomeSheet
+          open={isIncomeOpen}
+          onOpenChange={setIsIncomeOpen}
+          onAdd={addIncome}
+        />
       </>
     );
   }
