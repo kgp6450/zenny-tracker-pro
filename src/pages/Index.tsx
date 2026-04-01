@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { useIncome } from '@/hooks/useIncome';
 import { AddIncomeSheet } from '@/components/AddIncomeSheet';
 import { IncomeList } from '@/components/IncomeList';
+import { SpendingVsIncomeChart } from '@/components/SpendingVsIncomeChart';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/contexts/AuthContext';
