@@ -188,7 +188,7 @@ const Index = () => {
   };
 
 
-  const handleTabChange = (tab: 'dashboard' | 'add' | 'history' | 'settings') => {
+  const handleTabChange = (tab: 'dashboard' | 'add' | 'history' | 'income' | 'settings') => {
     if (tab === 'history') {
       setActiveTab('history');
       if (!isExpensesOpen) {
@@ -199,6 +199,8 @@ const Index = () => {
       }, 100);
     } else if (tab === 'settings') {
       setActiveTab('settings');
+    } else if (tab === 'income') {
+      setActiveTab('income');
     } else {
       setActiveTab(tab);
       window.scrollTo({ top: 0, behavior: 'smooth' });
