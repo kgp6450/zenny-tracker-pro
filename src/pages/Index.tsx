@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { useIncome } from '@/hooks/useIncome';
 import { AddIncomeSheet } from '@/components/AddIncomeSheet';
 import { IncomeList } from '@/components/IncomeList';
+import { SpendingVsIncomeChart } from '@/components/SpendingVsIncomeChart';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/contexts/AuthContext';
@@ -395,6 +396,16 @@ const Index = () => {
                     document.querySelector('[data-expenses-section]')?.scrollIntoView({ behavior: 'smooth' });
                   }, 100);
                 }}
+              />
+            </div>
+
+            {/* Spending vs Income Chart */}
+            <div className="animate-in-delay-2">
+              <SpendingVsIncomeChart
+                expenses={expenses}
+                incomes={incomes}
+                periodType={periodType}
+                currentDate={selectedDate}
               />
             </div>
 
