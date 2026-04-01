@@ -399,6 +399,16 @@ const Index = () => {
               />
             </div>
 
+            {/* Spending vs Income Chart */}
+            <div className="animate-in-delay-2">
+              <SpendingVsIncomeChart
+                expenses={expenses}
+                incomes={incomes}
+                periodType={periodType}
+                currentDate={selectedDate}
+              />
+            </div>
+
             {/* Cashflow Overview */}
             <div className="animate-in-delay-2">
               <CashflowOverview
