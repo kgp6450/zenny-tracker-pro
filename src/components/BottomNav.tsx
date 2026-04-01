@@ -4,8 +4,8 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/hooks/useHapticFeedback';
 
 interface BottomNavProps {
-  activeTab: 'dashboard' | 'add' | 'history' | 'settings';
-  onTabChange: (tab: 'dashboard' | 'add' | 'history' | 'settings') => void;
+  activeTab: 'dashboard' | 'add' | 'history' | 'income' | 'settings';
+  onTabChange: (tab: 'dashboard' | 'add' | 'history' | 'income' | 'settings') => void;
   onAddPress: () => void;
   onAddIncome?: () => void;
 }
