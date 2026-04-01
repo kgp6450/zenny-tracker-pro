@@ -4,6 +4,7 @@ import { LogOut, Calendar, List, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { useIncome } from '@/hooks/useIncome';
 import { AddIncomeSheet } from '@/components/AddIncomeSheet';
+import { IncomeList } from '@/components/IncomeList';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/contexts/AuthContext';
@@ -51,7 +52,7 @@ const Index = () => {
   const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(null);
   const [isDaySheetOpen, setIsDaySheetOpen] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'add' | 'history' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'add' | 'history' | 'income' | 'settings'>('dashboard');
   const [isExpensesOpen, setIsExpensesOpen] = useState(() => {
     const saved = localStorage.getItem('expenses-section-open');
     return saved !== null ? JSON.parse(saved) : false;
@@ -88,7 +89,7 @@ const Index = () => {
   } = useExpenses();
 
   const { categories, addCategory } = useCategories();
-  const { addIncome } = useIncome();
+  const { incomes, addIncome, deleteIncome } = useIncome();
 
   const handleDuplicateExpense = useCallback(async (expense: Expense) => {
     const today = new Date();
@@ -187,7 +188,7 @@ const Index = () => {
   };
 
 
-  const handleTabChange = (tab: 'dashboard' | 'add' | 'history' | 'settings') => {
+  const handleTabChange = (tab: 'dashboard' | 'add' | 'history' | 'income' | 'settings') => {
     if (tab === 'history') {
       setActiveTab('history');
       if (!isExpensesOpen) {
@@ -198,6 +199,8 @@ const Index = () => {
       }, 100);
     } else if (tab === 'settings') {
       setActiveTab('settings');
+    } else if (tab === 'income') {
+      setActiveTab('income');
     } else {
       setActiveTab(tab);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -211,6 +214,67 @@ const Index = () => {
         <SettingsPage onBack={() => setActiveTab('dashboard')} />
         <BottomNav 
           activeTab={activeTab} 
+          onTabChange={handleTabChange}
+          onAddPress={() => {
+            haptic.medium();
+            setIsAddOpen(true);
+          }}
+          onAddIncome={() => setIsIncomeOpen(true)}
+        />
+        <AddExpenseSheet
+          open={isAddOpen}
+          onOpenChange={setIsAddOpen}
+          onAdd={addExpense}
+          categories={categories}
+          onAddCategory={addCategory}
+          mostUsedCategory={
+            expenses.length > 0
+              ? Object.entries(getCategoryTotals(expenses))
+                  .sort(([, a], [, b]) => b - a)[0]?.[0]
+              : undefined
+          }
+        />
+        <AddIncomeSheet
+          open={isIncomeOpen}
+          onOpenChange={setIsIncomeOpen}
+          onAdd={addIncome}
+        />
+      </>
+    );
+  }
+
+  // Show income page
+  if (activeTab === 'income') {
+    return (
+      <>
+        <div className="min-h-screen bg-background pb-24">
+          <header className="px-5 pt-12 pb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-card shadow-sm border border-border flex items-center justify-center overflow-hidden">
+                <img src={appLogo} alt="Expense Tracker" className="w-8 h-8 object-contain" />
+              </div>
+              <h1 className="font-display text-2xl font-bold text-foreground">Income</h1>
+            </div>
+          </header>
+          <main className="px-5">
+            <PeriodNavigator
+              selectedDate={selectedDate}
+              periodType={periodType}
+              onDateChange={handleDateChange}
+              onPeriodTypeChange={handlePeriodTypeChange}
+            />
+            <div className="mt-5">
+              <IncomeList
+                incomes={incomes}
+                onDelete={deleteIncome}
+                currentDate={selectedDate}
+                periodType={periodType}
+              />
+            </div>
+          </main>
+        </div>
+        <BottomNav
+          activeTab={activeTab}
           onTabChange={handleTabChange}
           onAddPress={() => {
             haptic.medium();

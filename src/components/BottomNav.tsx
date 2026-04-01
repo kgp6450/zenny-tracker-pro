@@ -4,8 +4,8 @@ import { cn } from '@/lib/utils';
 import { haptic } from '@/hooks/useHapticFeedback';
 
 interface BottomNavProps {
-  activeTab: 'dashboard' | 'add' | 'history' | 'settings';
-  onTabChange: (tab: 'dashboard' | 'add' | 'history' | 'settings') => void;
+  activeTab: 'dashboard' | 'add' | 'history' | 'income' | 'settings';
+  onTabChange: (tab: 'dashboard' | 'add' | 'history' | 'income' | 'settings') => void;
   onAddPress: () => void;
   onAddIncome?: () => void;
 }
@@ -74,7 +74,7 @@ export const BottomNav = ({ activeTab, onTabChange, onAddPress, onAddIncome }: B
               onTabChange('dashboard');
             }}
             className={cn(
-              "flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-200 press-effect",
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-200 press-effect",
               activeTab === 'dashboard' 
                 ? "text-primary" 
                 : "text-muted-foreground hover:text-foreground"
@@ -92,7 +92,7 @@ export const BottomNav = ({ activeTab, onTabChange, onAddPress, onAddIncome }: B
               onTabChange('history');
             }}
             className={cn(
-              "flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-200 press-effect",
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-200 press-effect",
               activeTab === 'history' 
                 ? "text-primary" 
                 : "text-muted-foreground hover:text-foreground"
@@ -159,6 +159,24 @@ export const BottomNav = ({ activeTab, onTabChange, onAddPress, onAddIncome }: B
             </button>
           </div>
 
+          {/* Income */}
+          <button
+            data-tab="income"
+            onClick={() => {
+              haptic.light();
+              onTabChange('income');
+            }}
+            className={cn(
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-200 press-effect",
+              activeTab === 'income' 
+                ? "text-primary" 
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <TrendingUp className={cn("w-5 h-5 transition-transform duration-300", activeTab === 'income' && "scale-110")} />
+            <span className={cn("text-[10px] font-medium transition-all duration-300", activeTab === 'income' ? "opacity-100" : "opacity-70")}>Income</span>
+          </button>
+
           {/* Settings */}
           <button
             data-tab="settings"
@@ -167,7 +185,7 @@ export const BottomNav = ({ activeTab, onTabChange, onAddPress, onAddIncome }: B
               onTabChange('settings');
             }}
             className={cn(
-              "flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-200 press-effect",
+              "flex flex-col items-center gap-1 px-3 py-2 rounded-2xl transition-all duration-200 press-effect",
               activeTab === 'settings' 
                 ? "text-primary" 
                 : "text-muted-foreground hover:text-foreground"
