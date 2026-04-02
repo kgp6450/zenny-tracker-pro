@@ -108,7 +108,8 @@ export const IncomeList = ({ incomes, onDelete, onEdit, currentDate, periodType 
           {filteredIncomes.map((income) => (
             <div
               key={income.id}
-              className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border transition-colors hover:bg-muted/50"
+              onClick={() => onEdit(income)}
+              className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border transition-colors hover:bg-muted/50 cursor-pointer"
             >
               <div className="w-10 h-10 rounded-xl bg-accent/50 flex items-center justify-center text-lg shrink-0">
                 {SOURCE_ICONS[income.source] || '📦'}
