@@ -2,8 +2,9 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { LogOut, Calendar, List, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
-import { useIncome } from '@/hooks/useIncome';
+import { useIncome, Income } from '@/hooks/useIncome';
 import { AddIncomeSheet } from '@/components/AddIncomeSheet';
+import { EditIncomeSheet } from '@/components/EditIncomeSheet';
 import { IncomeList } from '@/components/IncomeList';
 import { SpendingVsIncomeChart } from '@/components/SpendingVsIncomeChart';
 import { useExpenses } from '@/hooks/useExpenses';
@@ -90,7 +91,8 @@ const Index = () => {
   } = useExpenses();
 
   const { categories, addCategory } = useCategories();
-  const { incomes, addIncome, deleteIncome } = useIncome();
+  const { incomes, addIncome, updateIncome, deleteIncome } = useIncome();
+  const [editingIncome, setEditingIncome] = useState<Income | null>(null);
 
   const handleDuplicateExpense = useCallback(async (expense: Expense) => {
     const today = new Date();
@@ -268,6 +270,7 @@ const Index = () => {
               <IncomeList
                 incomes={incomes}
                 onDelete={deleteIncome}
+                onEdit={(income) => setEditingIncome(income)}
                 currentDate={selectedDate}
                 periodType={periodType}
               />
@@ -300,6 +303,13 @@ const Index = () => {
           open={isIncomeOpen}
           onOpenChange={setIsIncomeOpen}
           onAdd={addIncome}
+        />
+        <EditIncomeSheet
+          income={editingIncome}
+          open={!!editingIncome}
+          onOpenChange={(open) => { if (!open) setEditingIncome(null); }}
+          onUpdate={updateIncome}
+          onDelete={deleteIncome}
         />
       </>
     );

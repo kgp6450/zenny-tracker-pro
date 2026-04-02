@@ -19,11 +19,12 @@ const SOURCE_ICONS: Record<string, string> = {
 interface IncomeListProps {
   incomes: Income[];
   onDelete: (id: string) => void;
+  onEdit: (income: Income) => void;
   currentDate: Date;
   periodType: 'week' | 'month' | 'year';
 }
 
-export const IncomeList = ({ incomes, onDelete, currentDate, periodType }: IncomeListProps) => {
+export const IncomeList = ({ incomes, onDelete, onEdit, currentDate, periodType }: IncomeListProps) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredIncomes = incomes.filter(income => {
@@ -107,7 +108,8 @@ export const IncomeList = ({ incomes, onDelete, currentDate, periodType }: Incom
           {filteredIncomes.map((income) => (
             <div
               key={income.id}
-              className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border transition-colors hover:bg-muted/50"
+              onClick={() => onEdit(income)}
+              className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border transition-colors hover:bg-muted/50 cursor-pointer"
             >
               <div className="w-10 h-10 rounded-xl bg-accent/50 flex items-center justify-center text-lg shrink-0">
                 {SOURCE_ICONS[income.source] || '📦'}
