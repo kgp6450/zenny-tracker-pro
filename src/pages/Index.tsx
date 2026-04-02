@@ -270,6 +270,7 @@ const Index = () => {
               <IncomeList
                 incomes={incomes}
                 onDelete={deleteIncome}
+                onEdit={(income) => setEditingIncome(income)}
                 currentDate={selectedDate}
                 periodType={periodType}
               />
@@ -302,6 +303,13 @@ const Index = () => {
           open={isIncomeOpen}
           onOpenChange={setIsIncomeOpen}
           onAdd={addIncome}
+        />
+        <EditIncomeSheet
+          income={editingIncome}
+          open={!!editingIncome}
+          onOpenChange={(open) => { if (!open) setEditingIncome(null); }}
+          onUpdate={updateIncome}
+          onDelete={deleteIncome}
         />
       </>
     );
