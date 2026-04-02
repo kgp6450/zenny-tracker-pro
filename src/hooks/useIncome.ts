@@ -146,6 +146,7 @@ export const useIncome = () => {
   return {
     incomes,
     addIncome,
+    updateIncome,
     deleteIncome,
     getMonthlyIncome,
     isLoaded,

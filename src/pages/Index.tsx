@@ -90,7 +90,8 @@ const Index = () => {
   } = useExpenses();
 
   const { categories, addCategory } = useCategories();
-  const { incomes, addIncome, deleteIncome } = useIncome();
+  const { incomes, addIncome, updateIncome, deleteIncome } = useIncome();
+  const [editingIncome, setEditingIncome] = useState<Income | null>(null);
 
   const handleDuplicateExpense = useCallback(async (expense: Expense) => {
     const today = new Date();
