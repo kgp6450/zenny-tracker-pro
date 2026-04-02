@@ -266,7 +266,12 @@ const Index = () => {
               onDateChange={handleDateChange}
               onPeriodTypeChange={handlePeriodTypeChange}
             />
-            <div className="mt-5">
+            <div className="mt-5 space-y-5">
+              <IncomeSourcePieChart
+                incomes={incomes}
+                currentDate={selectedDate}
+                periodType={periodType}
+              />
               <IncomeList
                 incomes={incomes}
                 onDelete={deleteIncome}
