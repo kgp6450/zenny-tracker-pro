@@ -7,6 +7,7 @@ import { AddIncomeSheet } from '@/components/AddIncomeSheet';
 import { EditIncomeSheet } from '@/components/EditIncomeSheet';
 import { IncomeList } from '@/components/IncomeList';
 import { SpendingVsIncomeChart } from '@/components/SpendingVsIncomeChart';
+import { IncomeSourcePieChart } from '@/components/IncomeSourcePieChart';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/contexts/AuthContext';
@@ -266,7 +267,12 @@ const Index = () => {
               onDateChange={handleDateChange}
               onPeriodTypeChange={handlePeriodTypeChange}
             />
-            <div className="mt-5">
+            <div className="mt-5 space-y-5">
+              <IncomeSourcePieChart
+                incomes={incomes}
+                currentDate={selectedDate}
+                periodType={periodType}
+              />
               <IncomeList
                 incomes={incomes}
                 onDelete={deleteIncome}
