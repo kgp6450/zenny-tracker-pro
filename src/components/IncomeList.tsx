@@ -24,7 +24,7 @@ interface IncomeListProps {
   periodType: 'week' | 'month' | 'year';
 }
 
-export const IncomeList = ({ incomes, onDelete, currentDate, periodType }: IncomeListProps) => {
+export const IncomeList = ({ incomes, onDelete, onEdit, currentDate, periodType }: IncomeListProps) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredIncomes = incomes.filter(income => {
