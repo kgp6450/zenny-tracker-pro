@@ -82,6 +82,39 @@ export const useIncome = () => {
     }
   }, [user]);
 
+  const updateIncome = useCallback(async (id: string, updates: { amount: number; source: string; date: string; note?: string }) => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('income')
+      .update({
+        amount: updates.amount,
+        source: updates.source,
+        date: updates.date,
+        note: updates.note || null,
+      })
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating income:', error);
+      throw error;
+    }
+
+    if (data) {
+      setIncomes(prev => prev.map(i => i.id === id ? {
+        id: data.id,
+        amount: Number(data.amount),
+        source: data.source,
+        date: data.date,
+        note: data.note || undefined,
+        created_at: data.created_at,
+      } : i));
+    }
+  }, [user]);
+
   const deleteIncome = useCallback(async (id: string) => {
     if (!user) return;
 
