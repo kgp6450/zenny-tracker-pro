@@ -19,6 +19,7 @@ const SOURCE_ICONS: Record<string, string> = {
 interface IncomeListProps {
   incomes: Income[];
   onDelete: (id: string) => void;
+  onEdit: (income: Income) => void;
   currentDate: Date;
   periodType: 'week' | 'month' | 'year';
 }
