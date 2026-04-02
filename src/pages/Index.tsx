@@ -7,6 +7,7 @@ import { AddIncomeSheet } from '@/components/AddIncomeSheet';
 import { EditIncomeSheet } from '@/components/EditIncomeSheet';
 import { IncomeList } from '@/components/IncomeList';
 import { SpendingVsIncomeChart } from '@/components/SpendingVsIncomeChart';
+import { IncomeSourcePieChart } from '@/components/IncomeSourcePieChart';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useCategories } from '@/hooks/useCategories';
 import { useAuth } from '@/contexts/AuthContext';
